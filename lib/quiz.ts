@@ -1,14 +1,18 @@
-import type { ChoiceKey, Question } from "@/data/daily";
-import type { Language } from "@/lib/i18n";
+import type { ChoiceKey, DailyChallenge, Question } from "@/data/daily";
+import { t, type Language } from "@/lib/i18n";
 
 export type AnswerMap = Record<string, ChoiceKey>;
 
-export function isCorrect(question: Question, answer?: ChoiceKey) {
+export function correctChoiceFor(question: Question): ChoiceKey {
     if (question.mode === "pair") {
-        return answer === question.aiAnswer;
+        return question.aiAnswer;
     }
 
-    return answer === (question.aiAnswer ? "ai" : "real");
+    return question.aiAnswer ? "ai" : "real";
+}
+
+export function isCorrect(question: Question, answer?: ChoiceKey) {
+    return answer === correctChoiceFor(question);
 }
 
 export function scoreAnswers(questions: Question[], answers: AnswerMap) {
@@ -18,13 +22,67 @@ export function scoreAnswers(questions: Question[], answers: AnswerMap) {
     );
 }
 
-function hashSeed(seed: string) {
+export function llmChoiceFor(question: Question): ChoiceKey {
+    return question.llmAnswer;
+}
+
+export function isLlmCorrect(question: Question) {
+    return isCorrect(question, llmChoiceFor(question));
+}
+
+export function scoreLlmAnswers(questions: Question[]) {
+    return questions.reduce(
+        (score, question) => score + (isLlmCorrect(question) ? 1 : 0),
+        0
+    );
+}
+
+export function llmReasonFor(question: Question, language: Language) {
+    if (isLlmCorrect(question)) {
+        return t(question.explanation, language);
+    }
+
+    if (question.mode === "pair") {
+        const option = question.llmAnswer.toUpperCase();
+        if (language === "zh") {
+            return `它更怀疑 ${option} 这张，因为这边的质感和光影看起来更像被过度处理过，但这次判断偏了。`;
+        }
+
+        return `It leaned toward ${option} because the texture and lighting felt slightly more over-processed, but that read was off this time.`;
+    }
+
+    if (question.llmAnswer === "ai") {
+        if (language === "zh") {
+            return "它觉得这张图的光线和质感太规整了，所以偏向判断为 AI 生成，但这次高估了那种“过于完美”的感觉。";
+        }
+
+        return "It felt the lighting and texture looked too polished, so it called the image AI-generated, but it over-read that polished look.";
+    }
+
+    if (language === "zh") {
+        return "它觉得画面里的杂乱感和噪点更像真实拍摄，因此判断成了真实照片，但这次把伪装感当成了生活感。";
+    }
+
+    return "It read the messiness and camera noise as more natural, so it called the image real, but that realism was faked.";
+}
+
+export function hashSeed(seed: string) {
     let hash = 2166136261;
     for (let i = 0; i < seed.length; i += 1) {
         hash ^= seed.charCodeAt(i);
         hash = Math.imul(hash, 16777619);
     }
     return hash >>> 0;
+}
+
+export function opponentNameForChallenge(
+    challenge: DailyChallenge,
+    category: string
+) {
+    const pool = challenge.opponentPool;
+    if (pool.length === 0) return "Vision Model";
+    const index = hashSeed(`${challenge.day}-${category}`) % pool.length;
+    return pool[index];
 }
 
 export function interleaveQuestions(questions: Question[], seed: string): Question[] {
@@ -79,4 +137,21 @@ export function resultLine(score: number, total: number, language: Language) {
     if (ratio >= 0.7) return "You still have a good eye for synthetic detail.";
     if (ratio >= 0.5) return "You caught some tells, but the hardest images landed.";
     return "The synthetic images did their job.";
+}
+
+export function battleResultLine(
+    playerScore: number,
+    llmScore: number,
+    opponentName: string,
+    language: Language
+) {
+    if (language === "zh") {
+        if (playerScore > llmScore) return `你赢了 ${opponentName}。`;
+        if (playerScore < llmScore) return `${opponentName} 这轮赢了你。`;
+        return `你和 ${opponentName} 打平了。`;
+    }
+
+    if (playerScore > llmScore) return `You beat ${opponentName}.`;
+    if (playerScore < llmScore) return `${opponentName} beat you this round.`;
+    return `You tied with ${opponentName}.`;
 }

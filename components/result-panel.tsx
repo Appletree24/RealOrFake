@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { DailyChallenge } from "@/data/daily";
 import type { Language } from "@/lib/i18n";
 import { copy } from "@/lib/i18n";
-import { percentile, resultLine } from "@/lib/quiz";
+import { battleResultLine, percentile, resultLine } from "@/lib/quiz";
 import {
     MAX_NICKNAME_LENGTH,
     buildInviteUrl,
@@ -16,6 +16,8 @@ import { useEffect, useRef, useState } from "react";
 type ResultPanelProps = {
     challenge: DailyChallenge;
     score: number;
+    llmScore: number;
+    opponentName: string;
     category?: string;
     language: Language;
     onRestart: () => void;
@@ -52,6 +54,8 @@ async function copyToClipboard(text: string) {
 export function ResultPanel({
     challenge,
     score,
+    llmScore,
+    opponentName,
     category,
     language,
     onRestart
@@ -59,7 +63,8 @@ export function ResultPanel({
     const total = challenge.questions.length;
     const rank = percentile(score, total);
     const c = copy[language];
-    const shareText = c.shareText(score, total);
+    const shareText = c.shareText(score, total, opponentName, llmScore);
+    const battleLine = battleResultLine(score, llmScore, opponentName, language);
 
     const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
     const [nicknameDraft, setNicknameDraft] = useState("");
@@ -136,11 +141,33 @@ export function ResultPanel({
                     {score}/{total}
                 </h1>
                 <p className="mx-auto mt-5 max-w-xl text-xl leading-8 text-ink">
+                    {battleLine}
+                </p>
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-muted">
                     {resultLine(score, total, language)}
                 </p>
                 <p className="mt-4 text-sm text-muted">
                     {c.betterThan} {rank}% {c.players}
                 </p>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-md border border-line bg-white/70 px-5 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                        {c.yourScoreLabel}
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-ink">
+                        {score}/{total}
+                    </p>
+                </div>
+                <div className="rounded-md border border-line bg-white/70 px-5 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                        {c.opponentScoreLabel(opponentName)}
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-ink">
+                        {llmScore}/{total}
+                    </p>
+                </div>
             </div>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">

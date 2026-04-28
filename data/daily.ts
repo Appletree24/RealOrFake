@@ -46,12 +46,14 @@ export type PairQuestion = BaseQuestion & {
     a: ImageChoice;
     b: ImageChoice;
     aiAnswer: PairChoiceKey;
+    llmAnswer: PairChoiceKey;
 };
 
 export type SingleQuestion = BaseQuestion & {
     mode: "single";
     image: Omit<ImageChoice, "key">;
     aiAnswer: boolean;
+    llmAnswer: SingleChoiceKey;
 };
 
 export type Question = PairQuestion | SingleQuestion;
@@ -59,6 +61,7 @@ export type Question = PairQuestion | SingleQuestion;
 export type DailyChallenge = {
     day: string;
     title: LocalizedText;
+    opponentPool: string[];
     questions: Question[];
 };
 
@@ -249,11 +252,17 @@ export const categoryDeck: CategoryDefinition[] = [
 ];
 
 export const dailyChallenge: DailyChallenge = {
-    day: "2026-04-27",
+    day: "2026-04-28",
     title: {
         en: "China Launch Set",
         zh: "国内传播题库"
     },
+    opponentPool: [
+        "Claude Sonnet 4.6",
+        "Gemini 3.1 Pro",
+        "Grok 4",
+        "豆包"
+    ],
     questions: [
         {
             id: "y2k-karaoke-001",
@@ -263,7 +272,7 @@ export const dailyChallenge: DailyChallenge = {
             title: { en: "KTV snapshot with timestamp", zh: "带时间戳的KTV旧照" },
             a: {
                 key: "a",
-                src: "/quiz/y2k-ccd/y2k-karaoke-001-a.jpg",
+                src: "/quiz/y2k-ccd/y2k-karaoke-001-a.png",
                 alt: { en: "KTV option A", zh: "KTV选项 A" },
                 palette: "cool"
             },
@@ -274,6 +283,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "rose"
             },
             aiAnswer: "a",
+            llmAnswer: "a",
             explanation: {
                 en: "The timestamp glow is too sharp while the faces and table edge are heavily blurred.",
                 zh: "时间戳边缘过于锐利，但人脸和桌沿却糊得很重。"
@@ -291,6 +301,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "cool"
             },
             aiAnswer: true,
+            llmAnswer: "ai",
             explanation: {
                 en: "The flash reflection is clean, but the phone edge and mirror stains do not line up.",
                 zh: "闪光灯反射很干净，但手机边缘和镜面污渍对不上。"
@@ -310,11 +321,12 @@ export const dailyChallenge: DailyChallenge = {
             },
             b: {
                 key: "b",
-                src: "/quiz/childhood/childhood-playground-001-b.jpg",
+                src: "/quiz/childhood/childhood-playground-001-b.png",
                 alt: { en: "Playground option B", zh: "操场选项 B" },
                 palette: "warm"
             },
             aiAnswer: "b",
+            llmAnswer: "a",
             explanation: {
                 en: "The school fence repeats and one child's sleeve blends into the slide.",
                 zh: "学校围栏出现重复，一个孩子的袖口也和滑梯粘在一起。"
@@ -332,6 +344,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "warm"
             },
             aiAnswer: false,
+            llmAnswer: "real",
             explanation: {
                 en: "The uneven flash, awkward crop, and messy table feel like a real family snapshot.",
                 zh: "闪光不均、裁切别扭、桌面杂乱，更像真实家庭快照。"
@@ -356,6 +369,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "cool"
             },
             aiAnswer: "b",
+            llmAnswer: "b",
             explanation: {
                 en: "The keyboard rows bend near the cup, and one charging cable has no visible end.",
                 zh: "杯子旁边的键盘行发生弯曲，一根充电线也没有明确的末端。"
@@ -373,6 +387,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "neutral"
             },
             aiAnswer: false,
+            llmAnswer: "ai",
             explanation: {
                 en: "The clutter, wrinkles, and uneven light feel naturally lived-in.",
                 zh: "杂物、褶皱和不均匀光线都更像真实住过的空间。"
@@ -397,6 +412,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "cool"
             },
             aiAnswer: "a",
+            llmAnswer: "a",
             explanation: {
                 en: "Several phone screens show the same stage shape with different viewing angles.",
                 zh: "几块手机屏幕里舞台形状相同，但拍摄角度却不一致。"
@@ -414,6 +430,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "rose"
             },
             aiAnswer: true,
+            llmAnswer: "ai",
             explanation: {
                 en: "The light beams cross cleanly, but the crowd silhouettes repeat in clusters.",
                 zh: "灯束交叉得很干净，但观众剪影成组重复。"
@@ -433,11 +450,12 @@ export const dailyChallenge: DailyChallenge = {
             },
             b: {
                 key: "b",
-                src: "/quiz/ita-bag/ita-bag-badges-001-b.jpg",
+                src: "/quiz/ita-bag/ita-bag-badges-001-b.png",
                 alt: { en: "Ita bag option B", zh: "痛包选项 B" },
                 palette: "neutral"
             },
             aiAnswer: "b",
+            llmAnswer: "a",
             explanation: {
                 en: "Badge faces repeat with tiny expression changes, and some pin edges melt into fabric.",
                 zh: "吧唧人物脸重复但表情细节微变，几个别针边缘也融进布料里。"
@@ -455,6 +473,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "cool"
             },
             aiAnswer: true,
+            llmAnswer: "ai",
             explanation: {
                 en: "The tiny character eyes and printed text become inconsistent across repeated items.",
                 zh: "重复小物里的角色眼睛和印刷小字不稳定。"
@@ -479,6 +498,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "rose"
             },
             aiAnswer: "a",
+            llmAnswer: "a",
             explanation: {
                 en: "The lane markings and car contours drift slightly, even though the camera position barely moves.",
                 zh: "镜头机位几乎没变，但车身轮廓和地面线条有轻微漂移。"
@@ -496,6 +516,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "warm"
             },
             aiAnswer: false,
+            llmAnswer: "ai",
             explanation: {
                 en: "The wet pavement glow, mixed signage, and uneven reflections are all plausible in a real street photo.",
                 zh: "地面积水反光、杂乱店招和不均匀倒影都很像真实街拍里会出现的状态。"
@@ -515,11 +536,12 @@ export const dailyChallenge: DailyChallenge = {
             },
             b: {
                 key: "b",
-                src: "/quiz/local-food/hotpot-table-001-b.jpg",
+                src: "/quiz/local-food/hotpot-table-001-b.png",
                 alt: { en: "Hotpot option B", zh: "火锅选项 B" },
                 palette: "rose"
             },
             aiAnswer: "b",
+            llmAnswer: "b",
             explanation: {
                 en: "The steam shape repeats and the chopstick shadows do not match the overhead light.",
                 zh: "雾气形状重复，筷子的阴影也和顶灯方向对不上。"
@@ -532,14 +554,15 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Food reviews", zh: "探店美食" },
             title: { en: "Night market snack stall", zh: "夜市小吃摊随手拍" },
             image: {
-                src: "/quiz/local-food/street-snack-001.jpg",
+                src: "/quiz/local-food/street-snack-001.png",
                 alt: { en: "Night market snack stall", zh: "夜市小吃摊照片" },
                 palette: "warm"
             },
-            aiAnswer: false,
+            aiAnswer: true,
+            llmAnswer: "real",
             explanation: {
-                en: "The messy labels, oil stains, and mixed light feel naturally inconsistent.",
-                zh: "标签、油渍和混杂灯光都不够整齐，反而更像真实现场。"
+                en: "The billboard is too neat, unlike the real scene.",
+                zh: "摊子上的字过于整齐，反而不像真实现场。"
             }
         },
         {
@@ -561,6 +584,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "warm"
             },
             aiAnswer: "a",
+            llmAnswer: "b",
             explanation: {
                 en: "The window reflection does not match the mountain angle outside.",
                 zh: "窗户反射和窗外山体角度不一致。"
@@ -578,6 +602,7 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "warm"
             },
             aiAnswer: true,
+            llmAnswer: "ai",
             explanation: {
                 en: "The fork tines merge near the handle, and the fruit shadows point in different directions.",
                 zh: "叉齿在把手附近粘连，水果阴影方向也不一致。"

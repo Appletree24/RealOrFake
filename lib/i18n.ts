@@ -32,6 +32,11 @@ export const copy = {
         score: "Score",
         correct: "Correct.",
         fooled: "Fooled.",
+        battleCardTitle: "LLM opponent",
+        battleCorrect: (name: string) => `${name} also got this one right.`,
+        battleWrong: (name: string) => `${name} missed this one.`,
+        battleReasonLead: "It thought:",
+        yourScoreLabel: "You",
         noAnswer: "No answer selected.",
         pairMode: "A/B",
         singleMode: "Single image",
@@ -45,13 +50,23 @@ export const copy = {
         nextImage: "Next image",
         betterThan: "Better than",
         players: "of today's players.",
+        opponentScoreLabel: (name: string) => name,
         challengeFriend: "Challenge a friend",
         replay: "Replay",
         linkReady: "Daily challenge link ready.",
         linkCopied: "Invite link copied to clipboard.",
         copyFailed: "Couldn't copy automatically. Link is shown above — copy it manually.",
-        shareText: (score: number, total: number) =>
-            `I scored ${score}/${total} on AI Photo Challenge. Can you spot the synthetic images?`,
+        shareText: (score: number, total: number, opponentName: string, opponentScore: number) => {
+            if (score > opponentScore) {
+                return `I just outplayed ${opponentName} with a ${score}/${total}. Think you can clear this round too?`;
+            }
+
+            if (score < opponentScore) {
+                return `${opponentName} kinda diffed me this round and I only got ${score}/${total}. Try this set and get revenge.`;
+            }
+
+            return `I tied ${opponentName} at ${score}/${total} on this round. Try it and break the deadlock.`;
+        },
         nicknamePromptTitle: "Who should we name on the invite?",
         nicknamePromptHint: "Your friend will see this name above the challenge.",
         nicknamePlaceholder: "e.g. Alex",
@@ -90,6 +105,11 @@ export const copy = {
         score: "得分",
         correct: "答对了。",
         fooled: "被骗了。",
+        battleCardTitle: "LLM 对手",
+        battleCorrect: (name: string) => `${name} 这题也答对了。`,
+        battleWrong: (name: string) => `${name} 这题答错了。`,
+        battleReasonLead: "它的判断是：",
+        yourScoreLabel: "你",
         noAnswer: "还没有选择答案。",
         pairMode: "双图对比",
         singleMode: "单图判断",
@@ -103,13 +123,23 @@ export const copy = {
         nextImage: "下一题",
         betterThan: "超过了今日",
         players: "的玩家。",
+        opponentScoreLabel: (name: string) => name,
         challengeFriend: "挑战朋友",
         replay: "再玩一次",
         linkReady: "今日挑战链接已准备好。",
         linkCopied: "邀请链接已复制到剪贴板。",
         copyFailed: "自动复制失败，请从上方手动复制链接。",
-        shareText: (score: number, total: number) =>
-            `我在 AI 真假图挑战里得了 ${score}/${total}，你能识破哪张是 AI 图吗？`,
+        shareText: (score: number, total: number, opponentName: string, opponentScore: number) => {
+            if (score > opponentScore) {
+                return `这轮我把 ${opponentName} 打下线了，拿了 ${score}/${total}。你来试试，别被 AI 薄纱。不会这都要被它拿捏吧？`;
+            }
+
+            if (score < opponentScore) {
+                return `刚被 ${opponentName} 薄纱了，这轮我只有 ${score}/${total}。不服，来帮我复仇。不会你也要被它拿捏吧？`;
+            }
+
+            return `我和 ${opponentName} 这轮打成平手，都是 ${score}/${total}。这题库有点上头，你敢来破局吗？不会真要和它五五开吧？`;
+        },
         nicknamePromptTitle: "用什么名字发邀请？",
         nicknamePromptHint: "朋友打开链接时会在挑战页顶部看到这个名字。",
         nicknamePlaceholder: "例如：小明",

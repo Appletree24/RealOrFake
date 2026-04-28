@@ -11,7 +11,16 @@ import type { CategoryId, ChoiceKey, DailyChallenge } from "@/data/daily";
 import { categoryDeck } from "@/data/daily";
 import type { Language } from "@/lib/i18n";
 import { copy, languageLabel, t } from "@/lib/i18n";
-import { interleaveQuestions, mockWrongRate, scoreAnswers } from "@/lib/quiz";
+import {
+    correctChoiceFor,
+    interleaveQuestions,
+    isLlmCorrect,
+    llmReasonFor,
+    mockWrongRate,
+    opponentNameForChallenge,
+    scoreAnswers,
+    scoreLlmAnswers
+} from "@/lib/quiz";
 import { parseInviteFromSearch, type InviteContext } from "@/lib/share-context";
 import { ArrowRight, Eye, Languages, Sparkles, Trophy } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -48,6 +57,11 @@ export function QuizApp({ challenge }: QuizAppProps) {
     const score = useMemo(
         () => scoreAnswers(questions, answers),
         [answers, questions]
+    );
+    const llmScore = useMemo(() => scoreLlmAnswers(questions), [questions]);
+    const opponentName = useMemo(
+        () => opponentNameForChallenge(challenge, activeCategory),
+        [activeCategory, challenge]
     );
     const progress = ((index + (revealed ? 1 : 0)) / questions.length) * 100;
 
@@ -137,6 +151,8 @@ export function QuizApp({ challenge }: QuizAppProps) {
             <ResultPanel
                 challenge={activeChallenge}
                 score={score}
+                llmScore={llmScore}
+                opponentName={opponentName}
                 category={activeCategory}
                 language={language}
                 onRestart={restart}
@@ -144,15 +160,10 @@ export function QuizApp({ challenge }: QuizAppProps) {
         );
     }
 
-    const correctChoice =
-        question
-            ? question.mode === "pair"
-                ? question.aiAnswer
-                : question.aiAnswer
-                    ? "ai"
-                    : "real"
-            : undefined;
+    const correctChoice = question ? correctChoiceFor(question) : undefined;
     const selectedCorrect = selected === correctChoice;
+    const llmCorrect = question ? isLlmCorrect(question) : false;
+    const llmReason = question ? llmReasonFor(question, language) : "";
 
     const inviteBanner = invite ? (
         <div className="mt-2 flex items-start gap-3 rounded-md border border-line bg-white/55 px-4 py-3 shadow-soft-line sm:items-center">
@@ -295,21 +306,37 @@ export function QuizApp({ challenge }: QuizAppProps) {
 
                 <div className="mt-6 min-h-24 border-t border-line pt-5">
                     {revealed ? (
-                        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
-                            <div>
+                        <div className="grid gap-4">
+                            <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+                                <div>
+                                    <p className="text-xl font-semibold text-ink">
+                                        {selectedCorrect ? c.correct : c.fooled}
+                                    </p>
+                                    <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+                                        {c.missedPrefix}
+                                        {wrongRate}
+                                        {c.missedSuffix} {t(question.explanation, language)}
+                                    </p>
+                                </div>
+                                <Button onClick={next} size="lg">
+                                    {index === questions.length - 1 ? c.seeScore : c.nextImage}
+                                    <ArrowRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            <div className="rounded-md border border-line bg-white/70 px-4 py-4 shadow-soft-line">
+                                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                                    {c.battleCardTitle}
+                                </p>
                                 <p className="text-xl font-semibold text-ink">
-                                    {selectedCorrect ? c.correct : c.fooled}
+                                    {llmCorrect
+                                        ? c.battleCorrect(opponentName)
+                                        : c.battleWrong(opponentName)}
                                 </p>
                                 <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-                                    {c.missedPrefix}
-                                    {wrongRate}
-                                    {c.missedSuffix} {t(question.explanation, language)}
+                                    {c.battleReasonLead} {llmReason}
                                 </p>
                             </div>
-                            <Button onClick={next} size="lg">
-                                {index === questions.length - 1 ? c.seeScore : c.nextImage}
-                                <ArrowRight className="h-4 w-4" />
-                            </Button>
                         </div>
                     ) : (
                         <div className="flex items-center gap-3 text-sm text-muted">
