@@ -39,6 +39,7 @@ export type BaseQuestion = {
     category: LocalizedText;
     title: LocalizedText;
     explanation: LocalizedText;
+    llmExplanation: LocalizedText;
 };
 
 export type PairQuestion = BaseQuestion & {
@@ -265,140 +266,11 @@ export const dailyChallenge: DailyChallenge = {
     ],
     questions: [
         {
-            id: "y2k-karaoke-001",
-            mode: "pair",
-            categoryId: "y2k-ccd",
-            category: { en: "Y2K CCD", zh: "千禧年CCD" },
-            title: { en: "KTV snapshot with timestamp", zh: "带时间戳的KTV旧照" },
-            a: {
-                key: "a",
-                src: "/quiz/y2k-ccd/y2k-karaoke-001-a.png",
-                alt: { en: "KTV option A", zh: "KTV选项 A" },
-                palette: "cool"
-            },
-            b: {
-                key: "b",
-                src: "/quiz/y2k-ccd/y2k-karaoke-001-b.jpg",
-                alt: { en: "KTV option B", zh: "KTV选项 B" },
-                palette: "rose"
-            },
-            aiAnswer: "a",
-            llmAnswer: "a",
-            explanation: {
-                en: "The timestamp glow is too sharp while the faces and table edge are heavily blurred.",
-                zh: "时间戳边缘过于锐利，但人脸和桌沿却糊得很重。"
-            }
-        },
-        {
-            id: "y2k-mirror-001",
-            mode: "single",
-            categoryId: "y2k-ccd",
-            category: { en: "Y2K CCD", zh: "千禧年CCD" },
-            title: { en: "CCD mirror selfie in a mall restroom", zh: "商场洗手间CCD镜自拍" },
-            image: {
-                src: "/quiz/y2k-ccd/y2k-mirror-001.jpg",
-                alt: { en: "Y2K mirror selfie", zh: "千禧年镜自拍" },
-                palette: "cool"
-            },
-            aiAnswer: true,
-            llmAnswer: "ai",
-            explanation: {
-                en: "The flash reflection is clean, but the phone edge and mirror stains do not line up.",
-                zh: "闪光灯反射很干净，但手机边缘和镜面污渍对不上。"
-            }
-        },
-        {
-            id: "childhood-playground-001",
-            mode: "pair",
-            categoryId: "childhood",
-            category: { en: "Childhood", zh: "童年旧照" },
-            title: { en: "Primary school playground photo", zh: "小学操场旧照片" },
-            a: {
-                key: "a",
-                src: "/quiz/childhood/childhood-playground-001-a.jpg",
-                alt: { en: "Playground option A", zh: "操场选项 A" },
-                palette: "green"
-            },
-            b: {
-                key: "b",
-                src: "/quiz/childhood/childhood-playground-001-b.png",
-                alt: { en: "Playground option B", zh: "操场选项 B" },
-                palette: "warm"
-            },
-            aiAnswer: "b",
-            llmAnswer: "a",
-            explanation: {
-                en: "The school fence repeats and one child's sleeve blends into the slide.",
-                zh: "学校围栏出现重复，一个孩子的袖口也和滑梯粘在一起。"
-            }
-        },
-        {
-            id: "childhood-birthday-001",
-            mode: "single",
-            categoryId: "childhood",
-            category: { en: "Childhood", zh: "童年旧照" },
-            title: { en: "Birthday cake at home, early 2000s", zh: "千禧年前后的家里生日照" },
-            image: {
-                src: "/quiz/childhood/childhood-birthday-001.jpg",
-                alt: { en: "Childhood birthday photo", zh: "童年生日照片" },
-                palette: "warm"
-            },
-            aiAnswer: false,
-            llmAnswer: "real",
-            explanation: {
-                en: "The uneven flash, awkward crop, and messy table feel like a real family snapshot.",
-                zh: "闪光不均、裁切别扭、桌面杂乱，更像真实家庭快照。"
-            }
-        },
-        {
-            id: "dorm-desk-001",
-            mode: "pair",
-            categoryId: "dorm-life",
-            category: { en: "Dorm life", zh: "宿舍生活" },
-            title: { en: "Late-night dorm desk", zh: "深夜宿舍书桌" },
-            a: {
-                key: "a",
-                src: "/quiz/dorm-life/dorm-desk-001-a.jpg",
-                alt: { en: "Dorm desk option A", zh: "宿舍书桌选项 A" },
-                palette: "neutral"
-            },
-            b: {
-                key: "b",
-                src: "/quiz/dorm-life/dorm-desk-001-b.jpg",
-                alt: { en: "Dorm desk option B", zh: "宿舍书桌选项 B" },
-                palette: "cool"
-            },
-            aiAnswer: "b",
-            llmAnswer: "b",
-            explanation: {
-                en: "The keyboard rows bend near the cup, and one charging cable has no visible end.",
-                zh: "杯子旁边的键盘行发生弯曲，一根充电线也没有明确的末端。"
-            }
-        },
-        {
-            id: "dorm-bunk-001",
-            mode: "single",
-            categoryId: "dorm-life",
-            category: { en: "Dorm life", zh: "宿舍生活" },
-            title: { en: "Bunk bed with curtains and takeout bags", zh: "床帘和外卖袋旁的宿舍床位" },
-            image: {
-                src: "/quiz/dorm-life/dorm-bunk-001.jpg",
-                alt: { en: "Dorm bunk bed", zh: "宿舍床位照片" },
-                palette: "neutral"
-            },
-            aiAnswer: false,
-            llmAnswer: "ai",
-            explanation: {
-                en: "The clutter, wrinkles, and uneven light feel naturally lived-in.",
-                zh: "杂物、褶皱和不均匀光线都更像真实住过的空间。"
-            }
-        },
-        {
             id: "concert-crowd-001",
             mode: "pair",
             categoryId: "concert",
             category: { en: "Concerts", zh: "演唱会现场" },
-            title: { en: "Phone-shot concert crowd", zh: "手机拍的演唱会人群" },
+            title: { en: "Phone-shot concert crowd", zh: "手机拍的演唱会现场" },
             a: {
                 key: "a",
                 src: "/quiz/concert/concert-crowd-001-a.png",
@@ -412,96 +284,14 @@ export const dailyChallenge: DailyChallenge = {
                 palette: "cool"
             },
             aiAnswer: "a",
-            llmAnswer: "a",
+            llmAnswer: "b",
             explanation: {
-                en: "Several phone screens show the same stage shape with different viewing angles.",
-                zh: "几块手机屏幕里舞台形状相同，但拍摄角度却不一致。"
-            }
-        },
-        {
-            id: "concert-stage-001",
-            mode: "single",
-            categoryId: "concert",
-            category: { en: "Concerts", zh: "演唱会现场" },
-            title: { en: "Distant stage with heavy zoom", zh: "远距离放大的舞台照" },
-            image: {
-                src: "/quiz/concert/concert-stage-001.jpg",
-                alt: { en: "Distant concert stage", zh: "远距离演唱会舞台照" },
-                palette: "rose"
+                en: "It noticed that the stage brand, crowd distribution, lighting, and background city details are all too uniform.",
+                zh: "它在舞台品牌露出、人群分布、灯光烟雾、手机拍摄行为以及背景城市细节上都呈现出一种过于均匀和克制的“理想化结构”，缺少真实音乐节那种不可控的混乱、噪声与偶然性，从而在细节层面暴露出“被生成过”的痕迹"
             },
-            aiAnswer: true,
-            llmAnswer: "ai",
-            explanation: {
-                en: "The light beams cross cleanly, but the crowd silhouettes repeat in clusters.",
-                zh: "灯束交叉得很干净，但观众剪影成组重复。"
-            }
-        },
-        {
-            id: "ita-bag-badges-001",
-            mode: "pair",
-            categoryId: "ita-bag",
-            category: { en: "Ita bags", zh: "谷子痛包" },
-            title: { en: "Badge-covered ita bag on a cafe chair", zh: "咖啡馆椅子上的谷子痛包" },
-            a: {
-                key: "a",
-                src: "/quiz/ita-bag/ita-bag-badges-001-a.jpg",
-                alt: { en: "Ita bag option A", zh: "痛包选项 A" },
-                palette: "rose"
-            },
-            b: {
-                key: "b",
-                src: "/quiz/ita-bag/ita-bag-badges-001-b.png",
-                alt: { en: "Ita bag option B", zh: "痛包选项 B" },
-                palette: "neutral"
-            },
-            aiAnswer: "b",
-            llmAnswer: "a",
-            explanation: {
-                en: "Badge faces repeat with tiny expression changes, and some pin edges melt into fabric.",
-                zh: "吧唧人物脸重复但表情细节微变，几个别针边缘也融进布料里。"
-            }
-        },
-        {
-            id: "ita-bag-standees-001",
-            mode: "single",
-            categoryId: "ita-bag",
-            category: { en: "Ita bags", zh: "谷子痛包" },
-            title: { en: "Acrylic standees and stickers on a desk", zh: "书桌上的亚克力立牌和贴纸" },
-            image: {
-                src: "/quiz/ita-bag/ita-bag-standees-001.jpg",
-                alt: { en: "Acrylic standees and stickers", zh: "亚克力立牌和贴纸" },
-                palette: "cool"
-            },
-            aiAnswer: true,
-            llmAnswer: "ai",
-            explanation: {
-                en: "The tiny character eyes and printed text become inconsistent across repeated items.",
-                zh: "重复小物里的角色眼睛和印刷小字不稳定。"
-            }
-        },
-        {
-            id: "city-street-crosswalk-001",
-            mode: "pair",
-            categoryId: "photo-booth",
-            category: { en: "City streets", zh: "城市街景" },
-            title: { en: "Crosswalk at dusk with dense traffic", zh: "傍晚车流很密的城市路口" },
-            a: {
-                key: "a",
-                src: "/quiz/city-street/city-street-crosswalk-001-a.jpg",
-                alt: { en: "City street option A", zh: "城市街景选项 A" },
-                palette: "warm"
-            },
-            b: {
-                key: "b",
-                src: "/quiz/city-street/city-street-crosswalk-001-b.jpg",
-                alt: { en: "City street option B", zh: "城市街景选项 B" },
-                palette: "rose"
-            },
-            aiAnswer: "a",
-            llmAnswer: "a",
-            explanation: {
-                en: "The lane markings and car contours drift slightly, even though the camera position barely moves.",
-                zh: "镜头机位几乎没变，但车身轮廓和地面线条有轻微漂移。"
+            llmExplanation: {
+                en: "It also noticed that several phone screens repeat nearly the same stage outline despite clearly different viewing angles, so it correctly chose A.",
+                zh: "它认为这是2023 年草莓音乐节的现场图片，同时背景的城市天际线和黄昏天色，也符合户外音乐节傍晚演出的真实场景，所以错误判断 B 是 AI。"
             }
         },
         {
@@ -509,42 +299,21 @@ export const dailyChallenge: DailyChallenge = {
             mode: "single",
             categoryId: "photo-booth",
             category: { en: "City streets", zh: "城市街景" },
-            title: { en: "Storefront street shot after rain", zh: "雨后带橱窗反光的街景" },
+            title: { en: "City street after rain", zh: "雨后的街景" },
             image: {
                 src: "/quiz/city-street/city-street-window-001.jpg",
-                alt: { en: "Storefront city street", zh: "带橱窗的城市街景" },
+                alt: { en: "City street after rain", zh: "雨后的街景" },
                 palette: "warm"
             },
             aiAnswer: false,
             llmAnswer: "ai",
             explanation: {
-                en: "The wet pavement glow, mixed signage, and uneven reflections are all plausible in a real street photo.",
-                zh: "地面积水反光、杂乱店招和不均匀倒影都很像真实街拍里会出现的状态。"
-            }
-        },
-        {
-            id: "hotpot-table-001",
-            mode: "pair",
-            categoryId: "local-food",
-            category: { en: "Food reviews", zh: "探店美食" },
-            title: { en: "Hotpot table under warm light", zh: "暖光下的火锅探店图" },
-            a: {
-                key: "a",
-                src: "/quiz/local-food/hotpot-table-001-a.jpg",
-                alt: { en: "Hotpot option A", zh: "火锅选项 A" },
-                palette: "warm"
+                en: "The wet pavement glow and uneven reflections are all plausible in a real street photo.",
+                zh: "地面积水反光和不均匀倒影都很像真实街拍里会出现的状态。"
             },
-            b: {
-                key: "b",
-                src: "/quiz/local-food/hotpot-table-001-b.png",
-                alt: { en: "Hotpot option B", zh: "火锅选项 B" },
-                palette: "rose"
-            },
-            aiAnswer: "b",
-            llmAnswer: "b",
-            explanation: {
-                en: "The steam shape repeats and the chopstick shadows do not match the overhead light.",
-                zh: "雾气形状重复，筷子的阴影也和顶灯方向对不上。"
+            llmExplanation: {
+                en: "It felt the rain reflections and overall lighting looked a bit too polished, so it called the image AI-generated, but that instinct was off this time.",
+                zh: "它觉得雨后反光和整体光线有点过于规整，所以判断成了 AI 图，但这次这个直觉偏了。"
             }
         },
         {
@@ -563,49 +332,10 @@ export const dailyChallenge: DailyChallenge = {
             explanation: {
                 en: "The billboard is too neat, unlike the real scene.",
                 zh: "摊子上的字过于整齐，反而不像真实现场。"
-            }
-        },
-        {
-            id: "minsu-window-001",
-            mode: "pair",
-            categoryId: "minsu",
-            category: { en: "Minsu stays", zh: "民宿酒店" },
-            title: { en: "Mountain-view minsu room", zh: "山景民宿房间" },
-            a: {
-                key: "a",
-                src: "/quiz/minsu/minsu-window-001-a.jpg",
-                alt: { en: "Minsu option A", zh: "民宿选项 A" },
-                palette: "green"
             },
-            b: {
-                key: "b",
-                src: "/quiz/minsu/minsu-window-001-b.jpg",
-                alt: { en: "Minsu option B", zh: "民宿选项 B" },
-                palette: "warm"
-            },
-            aiAnswer: "a",
-            llmAnswer: "b",
-            explanation: {
-                en: "The window reflection does not match the mountain angle outside.",
-                zh: "窗户反射和窗外山体角度不一致。"
-            }
-        },
-        {
-            id: "hotel-breakfast-001",
-            mode: "single",
-            categoryId: "minsu",
-            category: { en: "Minsu stays", zh: "民宿酒店" },
-            title: { en: "Hotel breakfast tray", zh: "酒店早餐托盘" },
-            image: {
-                src: "/quiz/minsu/hotel-breakfast-001.jpg",
-                alt: { en: "Hotel breakfast tray", zh: "酒店早餐图" },
-                palette: "warm"
-            },
-            aiAnswer: true,
-            llmAnswer: "ai",
-            explanation: {
-                en: "The fork tines merge near the handle, and the fruit shadows point in different directions.",
-                zh: "叉齿在把手附近粘连，水果阴影方向也不一致。"
+            llmExplanation: {
+                en: "It read the night-market clutter and mixed lighting as natural street-life detail, so it called the image real, but that realism was faked.",
+                zh: "它把夜市摊位的杂乱感和混合光线当成了真实生活痕迹，所以判断成真实照片，但这份真实感其实是伪装出来的。"
             }
         }
     ]

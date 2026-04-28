@@ -1,5 +1,5 @@
 import type { ChoiceKey, DailyChallenge, Question } from "@/data/daily";
-import { t, type Language } from "@/lib/i18n";
+import type { Language } from "@/lib/i18n";
 
 export type AnswerMap = Record<string, ChoiceKey>;
 
@@ -35,35 +35,6 @@ export function scoreLlmAnswers(questions: Question[]) {
         (score, question) => score + (isLlmCorrect(question) ? 1 : 0),
         0
     );
-}
-
-export function llmReasonFor(question: Question, language: Language) {
-    if (isLlmCorrect(question)) {
-        return t(question.explanation, language);
-    }
-
-    if (question.mode === "pair") {
-        const option = question.llmAnswer.toUpperCase();
-        if (language === "zh") {
-            return `它更怀疑 ${option} 这张，因为这边的质感和光影看起来更像被过度处理过，但这次判断偏了。`;
-        }
-
-        return `It leaned toward ${option} because the texture and lighting felt slightly more over-processed, but that read was off this time.`;
-    }
-
-    if (question.llmAnswer === "ai") {
-        if (language === "zh") {
-            return "它觉得这张图的光线和质感太规整了，所以偏向判断为 AI 生成，但这次高估了那种“过于完美”的感觉。";
-        }
-
-        return "It felt the lighting and texture looked too polished, so it called the image AI-generated, but it over-read that polished look.";
-    }
-
-    if (language === "zh") {
-        return "它觉得画面里的杂乱感和噪点更像真实拍摄，因此判断成了真实照片，但这次把伪装感当成了生活感。";
-    }
-
-    return "It read the messiness and camera noise as more natural, so it called the image real, but that realism was faked.";
 }
 
 export function hashSeed(seed: string) {

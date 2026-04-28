@@ -15,7 +15,6 @@ import {
     correctChoiceFor,
     interleaveQuestions,
     isLlmCorrect,
-    llmReasonFor,
     mockWrongRate,
     opponentNameForChallenge,
     scoreAnswers,
@@ -39,6 +38,20 @@ export function QuizApp({ challenge }: QuizAppProps) {
     const [invite, setInvite] = useState<InviteContext | null>(null);
     const quizRef = useRef<HTMLElement>(null);
     const c = copy[language];
+    const playableCategories = useMemo(() => {
+        const ids = new Set<CategoryId>(["all"]);
+        for (const question of challenge.questions) {
+            ids.add(question.categoryId);
+        }
+        return ids;
+    }, [challenge.questions]);
+    const visibleCategories = useMemo(
+        () =>
+            categoryDeck.filter(
+                (category) => category.id === "all" || category.locked || playableCategories.has(category.id)
+            ),
+        [playableCategories]
+    );
 
     const questions = useMemo(() => {
         const filtered =
@@ -82,8 +95,8 @@ export function QuizApp({ challenge }: QuizAppProps) {
         if (!parsed) return;
         setInvite(parsed);
         if (parsed.category) {
-            const target = categoryDeck.find((item) => item.id === parsed.category);
-            if (target && !target.locked) {
+            const target = visibleCategories.find((item) => item.id === parsed.category);
+            if (target && !target.locked && playableCategories.has(target.id)) {
                 setActiveCategory(target.id);
                 setIndex(0);
                 setAnswers({});
@@ -91,7 +104,13 @@ export function QuizApp({ challenge }: QuizAppProps) {
                 setPhase("playing");
             }
         }
-    }, []);
+    }, [playableCategories, visibleCategories]);
+
+    useEffect(() => {
+        if (!visibleCategories.some((category) => category.id === activeCategory)) {
+            setActiveCategory("all");
+        }
+    }, [activeCategory, visibleCategories]);
 
     function toggleLanguage() {
         const nextLanguage = language === "en" ? "zh" : "en";
@@ -107,8 +126,8 @@ export function QuizApp({ challenge }: QuizAppProps) {
     }
 
     function selectCategory(category: CategoryId) {
-        const target = categoryDeck.find((item) => item.id === category);
-        if (target?.locked) return;
+        const target = visibleCategories.find((item) => item.id === category);
+        if (!target || target.locked) return;
         setActiveCategory(category);
         setIndex(0);
         setAnswers({});
@@ -163,7 +182,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
     const correctChoice = question ? correctChoiceFor(question) : undefined;
     const selectedCorrect = selected === correctChoice;
     const llmCorrect = question ? isLlmCorrect(question) : false;
-    const llmReason = question ? llmReasonFor(question, language) : "";
+    const llmReason = question ? t(question.llmExplanation, language) : "";
 
     const inviteBanner = invite ? (
         <div className="mt-2 flex items-start gap-3 rounded-md border border-line bg-white/55 px-4 py-3 shadow-soft-line sm:items-center">
@@ -224,7 +243,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                 {inviteBanner}
                 <CategoryShowcase
                     activeCategory={activeCategory}
-                    categories={categoryDeck}
+                    categories={visibleCategories}
                     language={language}
                     onSelect={selectCategory}
                     onStart={startChallenge}
