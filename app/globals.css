@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter";
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #f5f1ea;
+  color: #111111;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(180deg, #fbf8f2 0%, #f5f1ea 46%, #eee8dc 100%);
+  color: #111111;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(176, 74, 47, 0.2);
+}
+
+@keyframes category-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes quiet-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-category-drift {
+  animation: category-drift 28s linear infinite;
+}
+
+.animate-quiet-rise {
+  animation: quiet-rise 520ms ease-out both;
+}
