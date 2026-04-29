@@ -51,10 +51,50 @@ a {
   }
 }
 
+@keyframes homepage-drift-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+@keyframes homepage-drift-right {
+  from {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .animate-category-drift {
   animation: category-drift 28s linear infinite;
 }
 
 .animate-quiet-rise {
   animation: quiet-rise 520ms ease-out both;
+}
+
+.animate-homepage-drift-slow {
+  animation: homepage-drift-left 40s linear infinite;
+}
+
+.animate-homepage-drift-medium {
+  animation: homepage-drift-left 32s linear infinite;
+}
+
+.animate-homepage-drift-reverse {
+  animation: homepage-drift-right 36s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-category-drift,
+  .animate-quiet-rise,
+  .animate-homepage-drift-slow,
+  .animate-homepage-drift-medium,
+  .animate-homepage-drift-reverse {
+    animation: none !important;
+  }
 }

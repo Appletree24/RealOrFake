@@ -1,5 +1,6 @@
 "use client";
 
+import { HomepageBackground } from "@/components/homepage-background";
 import { ImageChoice } from "@/components/image-choice";
 import { ResultPanel } from "@/components/result-panel";
 import { SingleImageQuestion } from "@/components/single-image-question";
@@ -26,7 +27,8 @@ type QuizAppProps = {
     challenge: DailyChallenge;
 };
 
-const QUESTIONS_PER_RUN = 5;
+const DEFAULT_QUESTIONS_PER_RUN = 5;
+const QUESTION_COUNT_PRESETS = [3, 5, 8, 10] as const;
 
 function createRunSeed() {
     return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
@@ -42,7 +44,28 @@ export function QuizApp({ challenge }: QuizAppProps) {
     const [invite, setInvite] = useState<InviteContext | null>(null);
     const quizRef = useRef<HTMLElement>(null);
     const c = copy[language];
-    const questionsPerRun = Math.min(QUESTIONS_PER_RUN, challenge.questions.length);
+    const maxQuestionsPerRun = challenge.questions.length;
+    const initialQuestionsPerRun = Math.min(DEFAULT_QUESTIONS_PER_RUN, maxQuestionsPerRun);
+    const [selectedQuestionCount, setSelectedQuestionCount] = useState(initialQuestionsPerRun);
+    const questionsPerRun = Math.min(Math.max(selectedQuestionCount, 1), maxQuestionsPerRun);
+    const questionCountOptions = useMemo(() => {
+        const options: number[] = QUESTION_COUNT_PRESETS.filter((count) => count <= maxQuestionsPerRun);
+        if (maxQuestionsPerRun > 0 && !options.includes(maxQuestionsPerRun)) {
+            options.push(maxQuestionsPerRun);
+        }
+        return options;
+    }, [maxQuestionsPerRun]);
+    const homepageImageSources = useMemo(
+        () =>
+            challenge.questions
+                .flatMap((entry) =>
+                    entry.mode === "pair"
+                        ? [entry.a.src, entry.b.src]
+                        : [entry.image.src]
+                )
+                .filter((src): src is string => Boolean(src)),
+        [challenge.questions]
+    );
 
     const questions = useMemo(() => {
         if (!runSeed) return [];
@@ -78,8 +101,10 @@ export function QuizApp({ challenge }: QuizAppProps) {
         }
     }, []);
 
-    function startRun(seed = createRunSeed()) {
-        if (questionsPerRun === 0) return;
+    function startRun(seed = createRunSeed(), count = questionsPerRun) {
+        const nextCount = Math.min(Math.max(count, 1), maxQuestionsPerRun);
+        if (maxQuestionsPerRun === 0) return;
+        setSelectedQuestionCount(nextCount);
         setRunSeed(seed);
         setIndex(0);
         setAnswers({});
@@ -94,7 +119,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
         const parsed = parseInviteFromSearch(window.location.search);
         if (!parsed) return;
         setInvite(parsed);
-        startRun(parsed.runSeed ?? createRunSeed());
+        startRun(parsed.runSeed ?? createRunSeed(), parsed.total);
     }, []);
 
     function toggleLanguage() {
@@ -195,61 +220,93 @@ export function QuizApp({ challenge }: QuizAppProps) {
 
     if (phase === "intro" || !question) {
         return (
-            <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-4 sm:px-7 sm:py-5 lg:px-10">
-                {header}
-                {inviteBanner}
-                <section className="flex min-h-[calc(100svh-5.5rem)] items-center py-8 sm:py-10">
-                    <div className="animate-quiet-rise grid w-full gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(26rem,0.85fr)] xl:items-center xl:gap-10">
-                        <div className="max-w-none">
-                            <Badge>{c.truthKicker}</Badge>
-                            <h1 className="mt-5 text-4xl font-semibold leading-[1.08] text-ink sm:mt-6 sm:text-5xl lg:whitespace-nowrap lg:text-[3.25rem] lg:leading-[1.04] xl:text-5xl 2xl:text-6xl">
-                                {c.truthHeadline}
-                            </h1>
-                            <p className="mt-5 max-w-xl text-base leading-7 text-muted sm:mt-6 sm:text-lg sm:leading-8">
-                                {c.truthBody}
-                            </p>
+            <main className="relative overflow-hidden">
+                <HomepageBackground imageSources={homepageImageSources} />
+                <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-4 sm:px-7 sm:py-5 lg:px-10">
+                    {header}
+                    {inviteBanner}
+                    <section className="flex min-h-[calc(100svh-5.5rem)] items-center py-8 sm:py-10">
+                        <div className="animate-quiet-rise grid w-full gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(26rem,0.85fr)] xl:items-center xl:gap-10">
+                            <div className="max-w-none">
+                                <Badge>{c.truthKicker}</Badge>
+                                <h1 className="mt-5 text-4xl font-semibold leading-[1.08] text-ink sm:mt-6 sm:text-5xl lg:whitespace-nowrap lg:text-[3.25rem] lg:leading-[1.04] xl:text-5xl 2xl:text-6xl">
+                                    {c.truthHeadline}
+                                </h1>
+                                <p className="mt-5 max-w-xl text-base leading-7 text-muted sm:mt-6 sm:text-lg sm:leading-8">
+                                    {c.truthBody}
+                                </p>
 
-                            <div className="mt-8 flex flex-wrap gap-3">
-                                <Button
-                                    className="w-full sm:w-auto"
-                                    disabled={questionsPerRun === 0}
-                                    onClick={() => startRun()}
-                                    size="lg"
-                                    type="button"
-                                >
-                                    {c.startChallenge}
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="w-full max-w-xl rounded-2xl border border-line bg-white/65 p-6 shadow-soft-line xl:justify-self-end">
-                            <div className="flex items-center justify-between gap-3">
-                                <Badge className="normal-case">{c.mixedPool}</Badge>
-                                <p className="text-sm text-muted">{c.sceneCount(challenge.questions.length)}</p>
-                            </div>
-                            <p className="mt-4 text-3xl font-semibold text-ink">
-                                {questionsPerRun}
-                            </p>
-                            <p className="mt-2 text-sm leading-6 text-muted">
-                                {c.randomRunInfo(questionsPerRun, challenge.questions.length)}
-                            </p>
-                            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                                <div className="rounded-md border border-line bg-paper/70 px-4 py-4">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                                        {c.pairMode}
-                                    </p>
-                                    <p className="mt-2 text-sm leading-6 text-ink">{c.pairPrompt}</p>
-                                </div>
-                                <div className="rounded-md border border-line bg-paper/70 px-4 py-4">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                                        {c.singleMode}
-                                    </p>
-                                    <p className="mt-2 text-sm leading-6 text-ink">{c.singlePrompt}</p>
+                                <div className="mt-8 flex flex-wrap gap-3">
+                                    <Button
+                                        className="w-full sm:w-auto"
+                                        disabled={maxQuestionsPerRun === 0}
+                                        onClick={() => startRun()}
+                                        size="lg"
+                                        type="button"
+                                    >
+                                        {c.startChallenge}
+                                    </Button>
                                 </div>
                             </div>
+
+                            <div className="w-full max-w-xl rounded-2xl border border-line bg-white/72 p-6 shadow-soft-line backdrop-blur-[10px] xl:justify-self-end">
+                                <div className="flex items-center justify-between gap-3">
+                                    <Badge className="normal-case">{c.mixedPool}</Badge>
+                                </div>
+                                <div className="mt-4 flex items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                                            {c.questionsPerRunLabel}
+                                        </p>
+                                        <p className="mt-2 text-3xl font-semibold text-ink">
+                                            {questionsPerRun}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    {questionCountOptions.map((count) => {
+                                        const active = count === questionsPerRun;
+                                        const label =
+                                            count === maxQuestionsPerRun ? c.allQuestions : String(count);
+                                        return (
+                                            <button
+                                                aria-pressed={active}
+                                                className={`rounded-full border px-3 py-2 text-sm font-medium transition ${
+                                                    active
+                                                        ? "border-ink bg-ink text-paper"
+                                                        : "border-line bg-paper/70 text-ink hover:bg-white"
+                                                }`}
+                                                key={count}
+                                                onClick={() => setSelectedQuestionCount(count)}
+                                                type="button"
+                                            >
+                                                {label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="mt-3 text-xs leading-6 text-muted">{c.questionsPerRunHint}</p>
+                                <p className="mt-2 text-sm leading-6 text-muted">
+                                    {c.randomRunInfo(questionsPerRun)}
+                                </p>
+                                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                                    <div className="rounded-md border border-line bg-paper/75 px-4 py-4">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                                            {c.pairMode}
+                                        </p>
+                                        <p className="mt-2 text-sm leading-6 text-ink">{c.pairPrompt}</p>
+                                    </div>
+                                    <div className="rounded-md border border-line bg-paper/75 px-4 py-4">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                                            {c.singleMode}
+                                        </p>
+                                        <p className="mt-2 text-sm leading-6 text-ink">{c.singlePrompt}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
             </main>
         );
     }
@@ -336,7 +393,10 @@ export function QuizApp({ challenge }: QuizAppProps) {
                                     <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
                                         {c.missedPrefix}
                                         {wrongRate}
-                                        {c.missedSuffix} {t(question.explanation, language)}
+                                        {selectedCorrect
+                                            ? c.outperformedMissedSuffix
+                                            : c.missedSuffix}{" "}
+                                        {t(question.explanation, language)}
                                     </p>
                                 </div>
                                 <Button onClick={next} size="lg">

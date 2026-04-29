@@ -421,6 +421,150 @@ export const dailyChallenge: DailyChallenge = {
             llmAnswer: "a",
             explanation: { en: "The details of the era are “too uniform and pristine,” resembling retro memories curated by an algorithm rather than the slightly chaotic and serendipitous street scenes of the real world.", zh: "时代细节“过于统一且干净”，像是被算法整理过的复古记忆，而不是真实世界里那种略带混乱与偶然性的街景。" },
             llmExplanation: { en: "Taken by photographer Demuri Riyu in 1983, these photographs serve as authentic documentary images of the streetscape of Shanghai’s Nanjing East Road at that time, as the photographer, date, location, and details such as the architecture, traffic, and signage are all supported by reliable historical evidence.", zh: "由摄影师出目里利吕井 1983 年拍摄的照片，因拍摄者、时间、地点及建筑、交通、招牌等细节均有可靠历史佐证，是记录当时上海南京东路街景的真实纪实影像。" }
+        },
+        {
+            id: "moon-landing-photos-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Moon landing photos", zh: "登月照片" },
+            image: {
+                src: "/quiz/library/moon-landing-photos-001.webp",
+                alt: { en: "Moon landing photos", zh: "登月照片" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "There’s no need to say more, right?", zh: "不用多说了吧。" },
+            llmExplanation: { en: "It is a conceptual rendering released by China's lunar exploration program for future manned moon missions before 2030 (though the judgment is actually incorrect).", zh: "是中国探月工程发布的、对未来 2030 年前载人登月任务的概念渲染效果图（其实判断的也不对）" }
+        },
+        {
+            id: "the-kitten-eats-hot-pot-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "The kitten eats hot pot", zh: "小猫吃火锅" },
+            image: {
+                src: "/quiz/library/the-kitten-eats-hot-pot-001.webp",
+                alt: { en: "The kitten eats hot pot", zh: "小猫吃火锅" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "There’s no need to say more, right?", zh: "不用多说了吧。" },
+            llmExplanation: { en: "An AI-generated creative composite image, not a real photograph.", zh: "一张 AI 生成的创意合成图，并非真实拍摄的照片。" }
+        },
+        {
+            id: "meituan-food-delivery-rider-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Meituan food delivery rider", zh: "美团外卖员" },
+            image: {
+                src: "/quiz/library/meituan-food-delivery-rider-001.webp",
+                alt: { en: "Meituan food delivery rider", zh: "美团外卖员" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "Horses moving through the slippery city traffic lack the expected splashes, hoofprints, and real interactive reactions with the surrounding people and vehicles, giving the entire scene a sense of 'physically present but socially absent' dissonance.", zh: "马匹在湿滑城市车流中行进却缺乏应有的溅水、蹄印与周围人车的真实互动反应，使整个场景呈现出一种“物理存在但社会不存在”的违和感。" },
+            llmExplanation: { en: "Horses are prohibited on urban roads in reality: In our country, animal-drawn vehicles and horses are strictly forbidden on city motor vehicle roads. This kind of scene itself does not comply with traffic regulations and common sense.  \nObvious signs of composition: The lighting and perspective of the rider and horse in relation to the background show unnatural splicing; the rider's posture and the horse's movements have low integration with the rainy traffic.  \nContradictory background information: The 'Zhejiang Tailong Commercial Bank' appearing in the image is a bank in Taizhou, while the license plate 'Zhe B' belongs to Ningbo. This mismatch further supports that the picture was composited.", zh: "现实中城市道路禁止骑马通行：我国城市机动车道路严禁畜力、马匹通行，这种场景本身就不符合交通法规和常识。\n明显的合成痕迹：骑手、马匹与背景的光影、透视存在不自然的拼接感，骑手的姿态和马匹的动作与雨天车流的融合度较低。\n背景信息矛盾：图中出现的 “浙江泰隆商业银行” 是台州的银行，而车牌 “浙 B” 属于宁波，这种混搭也侧面印证了图片是拼接制作的。" }
+        },
+        {
+            id: "cosplayer-pictures-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Cosplayer pictures", zh: "Coser图片" },
+            image: {
+                src: "/quiz/library/cosplayer-pictures-001.webp",
+                alt: { en: "Cosplayer pictures", zh: "Coser图片" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "real",
+            explanation: { en: "The character is too 'camera-centered' and the skin details are unusually clean, making it look like a subject rendered separately and pasted onto the scene in the complex lighting and crowd environment of a convention.", zh: "人物过于“镜头中心化”和皮肤细节异常干净，在复杂漫展光源与人流环境中显得像被单独渲染贴上去的主体。" },
+            llmExplanation: { en: "It is a real-life cosplay photo of Rem at a comic convention.", zh: "是一张漫展上的真人雷姆 cosplay 实拍图。" }
+        },
+        {
+            id: "coser-six-grid-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Coser Six-Grid", zh: "Coser六宫格" },
+            image: {
+                src: "/quiz/library/coser-six-grid-001.webp",
+                alt: { en: "Coser Six-Grid", zh: "Coser六宫格" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "The character is too 'camera-centered' and the skin details are unusually clean, making it look like a subject rendered separately and pasted onto the scene in the complex lighting and crowd environment of a convention.", zh: "人物过于“镜头中心化”和皮肤细节异常干净，在复杂漫展光源与人流环境中显得像被单独渲染贴上去的主体。" },
+            llmExplanation: { en: "AI-generated creative cosplay composite image, not a real photographed photo.", zh: "AI 生成的创意 cosplay 合成图，并非真实拍摄的照片。" }
+        },
+        {
+            id: "coser-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Coser", zh: "Coser" },
+            image: {
+                src: "/quiz/library/coser-001.webp",
+                alt: { en: "Coser", zh: "Coser" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "The main character is too 'perfectly focused and flawless,' presenting studio-level lighting and skin texture even in the noisy convention environment, which is very difficult for a real camera to achieve with such clean separation.", zh: "人物主体过于“完美对焦且无瑕疵”，在嘈杂漫展环境中仍呈现棚拍级光影与皮肤质感，真实相机很难同时做到这种干净分离感。" },
+            llmExplanation: { en: "AI-generated fake images, not real photos of cosplay at conventions", zh: "AI 生成的假图，并非真实拍摄的漫展 cosplay 照片。" }
+        },
+        {
+            id: "baji-sharing-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "BaJi Sharing", zh: "吧唧分享" },
+            image: {
+                src: "/quiz/library/baji-sharing-001.webp",
+                alt: { en: "Coser", zh: "Coser" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "Multiple people are photographed up close, yet everyone is clear with no motion blur, and the lighting is even as if shot in a soft light studio; this is almost impossible to achieve simultaneously at a crowded, dynamic convention scene.", zh: "多人近距离围拍却人人清晰无运动模糊、光线均匀到像柔光棚拍，这在拥挤动态的漫展现场几乎不可能同时成立。" },
+            llmExplanation: { en: "The hands of the characters in the image have obvious deformities, abnormal numbers of fingers, distorted structures, and other typical AI-generated defects, and the overall lighting and details also have an unnatural sense of incongruity.", zh: "画面中人物的手部存在明显畸形、手指数量异常、结构扭曲等 AI 生成的典型缺陷，且整体光影和细节也存在不自然的违和感。" }
+        },
+        {
+            id: "assassin-s-creed-odyssey-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Assassin's Creed Odyssey", zh: "刺客信条奥德赛" },
+            image: {
+                src: "/quiz/library/assassin-s-creed-odyssey-001.webp",
+                alt: { en: "Assassin's Creed Odyssey", zh: "刺客信条奥德赛" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "real",
+            explanation: { en: "The perspective and layering of the UI elements are inconsistent with the ambient lighting and shadows, as if they were overlaid in post-production onto an 'overly realistic' scene, lacking a unified rendering logic.", zh: "UI元素与环境光影的透视和分层不一致，像是后期叠加在“过于真实”的场景上，缺乏统一渲染逻辑。" },
+            llmExplanation: { en: "This is a real in-game screenshot of 'Assassin's Creed: Odyssey,' not AI-generated. The UI, Corfu Island scene, Poseidon statue, and main character model all perfectly match the original game content.", zh: "是《刺客信条：奥德赛》的真实游戏截图，并非 AI 生成，界面 UI、科孚岛场景、波塞冬雕像与主角模型均与游戏原作内容完全吻合。" }
+        },
+        {
+            id: "genshin-impact-001",
+            mode: "single",
+            categoryId: "all",
+            category: { en: "Mixed pool", zh: "混合题池" },
+            title: { en: "Genshin Impact", zh: "原神" },
+            image: {
+                src: "/quiz/library/genshin-impact-001.webp",
+                alt: { en: "Genshin Impact", zh: "原神" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "real",
+            explanation: { en: "Although the image simulates a game screenshot, the HUD text and icons are too sharp and disconnected from the scene's depth of field and lighting, as if an interface layer was added in post-production.", zh: "画面虽模拟游戏截图，但HUD文字与图标过于锐利且与场景景深、光照脱节，像是后期平贴上去的界面层。" },
+            llmExplanation: { en: "This is a real screenshot from Genshin Impact; the interface UI, scenes, and characters completely match the original game content, with no AI-generated flaws.", zh: "是《原神》的真实游戏截图，界面 UI、场景、角色与游戏原作内容完全吻合，无 AI 生成的缺陷。" }
         }
     ]
 };

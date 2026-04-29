@@ -28,6 +28,7 @@ const EMAIL_CAPTURE_DISMISSED_KEY = "ai-photo-email-capture-dismissed";
 const EMAIL_CAPTURE_SUBMITTED_KEY = "ai-photo-email-capture-submitted";
 const TOAST_DURATION_MS = 2800;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+const CHALLENGE_PATHNAME = "/";
 
 async function copyToClipboard(text: string) {
     try {
@@ -108,7 +109,7 @@ export function ResultPanel({
     }
 
     function buildCurrentInviteLink() {
-        return buildInviteUrl(window.location.origin, window.location.pathname, {
+        return buildInviteUrl(window.location.origin, CHALLENGE_PATHNAME, {
             nickname: sanitizeNickname(nicknameDraft),
             score,
             total,
@@ -184,7 +185,7 @@ export function ResultPanel({
             window.localStorage.setItem(NICKNAME_STORAGE_KEY, nickname);
         }
 
-        const url = buildInviteUrl(window.location.origin, window.location.pathname, {
+        const stableUrl = buildInviteUrl(window.location.origin, CHALLENGE_PATHNAME, {
             nickname,
             score,
             total,
@@ -194,7 +195,7 @@ export function ResultPanel({
 
         setNicknameDialogOpen(false);
 
-        const payload = `${shareText} ${url}`;
+        const payload = `${shareText} ${stableUrl}`;
         const copied = await copyToClipboard(payload);
 
         if (copied) {
@@ -208,7 +209,7 @@ export function ResultPanel({
                 await navigator.share({
                     title: c.appName,
                     text: shareText,
-                    url
+                    url: stableUrl
                 });
             } catch {
                 // user cancelled share sheet; toast already reflects clipboard status
