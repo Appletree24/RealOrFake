@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 type HomepageBackgroundProps = {
     imageSources: string[];
@@ -18,11 +18,75 @@ function buildLaneImages(imageSources: string[], multiplier = 3) {
 }
 
 export function HomepageBackground({ imageSources }: HomepageBackgroundProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
     const sources = useMemo(() => {
         const unique = Array.from(new Set(imageSources.filter(Boolean)));
         if (unique.length === 0) return [];
         return unique;
     }, [imageSources]);
+
+    useEffect(() => {
+        const element = containerRef.current;
+        if (!element) return;
+
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const coarsePointer = window.matchMedia("(pointer: coarse)");
+
+        if (reducedMotion.matches || coarsePointer.matches) {
+            element.style.setProperty("--parallax-x", "0px");
+            element.style.setProperty("--parallax-y", "0px");
+            return;
+        }
+
+        let frameId = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        const render = () => {
+            currentX += (targetX - currentX) * 0.08;
+            currentY += (targetY - currentY) * 0.08;
+            element.style.setProperty("--parallax-x", `${currentX.toFixed(2)}px`);
+            element.style.setProperty("--parallax-y", `${currentY.toFixed(2)}px`);
+
+            if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1) {
+                frameId = window.requestAnimationFrame(render);
+            } else {
+                frameId = 0;
+            }
+        };
+
+        const handlePointerMove = (event: PointerEvent) => {
+            const offsetX = event.clientX / window.innerWidth - 0.5;
+            const offsetY = event.clientY / window.innerHeight - 0.5;
+            targetX = offsetX * 52;
+            targetY = offsetY * 34;
+
+            if (!frameId) {
+                frameId = window.requestAnimationFrame(render);
+            }
+        };
+
+        const reset = () => {
+            targetX = 0;
+            targetY = 0;
+            if (!frameId) {
+                frameId = window.requestAnimationFrame(render);
+            }
+        };
+
+        window.addEventListener("pointermove", handlePointerMove, { passive: true });
+        window.addEventListener("blur", reset);
+
+        return () => {
+            if (frameId) {
+                window.cancelAnimationFrame(frameId);
+            }
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("blur", reset);
+        };
+    }, []);
 
     if (sources.length === 0) return null;
 
@@ -32,14 +96,28 @@ export function HomepageBackground({ imageSources }: HomepageBackgroundProps) {
         <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 overflow-hidden"
+            ref={containerRef}
         >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.55),transparent_32%),linear-gradient(180deg,rgba(251,248,242,0.9),rgba(245,241,234,0.86)_48%,rgba(238,232,220,0.92))]" />
-            <div className="absolute inset-y-[-12%] left-1/2 w-[145%] -translate-x-1/2 -rotate-12">
+            <div
+                className="absolute inset-y-[-12%] left-1/2 w-[145%] -translate-x-1/2 -rotate-12"
+                style={{
+                    transform:
+                        "translate3d(calc(-50% + (var(--parallax-x, 0px) * -0.2)), calc(var(--parallax-y, 0px) * -0.14), 0) rotate(-12deg)"
+                }}
+            >
                 <div className="flex h-full flex-col justify-center gap-6 md:gap-8 xl:gap-10">
                     {LANES.map((lane, laneIndex) => (
                         <div
                             className={`flex w-max gap-4 md:gap-5 ${lane.durationClass} ${lane.offsetClass}`}
                             key={`${lane.direction}-${laneIndex}`}
+                            style={{
+                                transform: `translate3d(calc(var(--parallax-x, 0px) * ${
+                                    laneIndex === 0 ? -0.2 : laneIndex === 1 ? 0.12 : 0.28
+                                }), calc(var(--parallax-y, 0px) * ${
+                                    laneIndex === 0 ? -0.24 : laneIndex === 1 ? 0.16 : 0.34
+                                }), 0)`
+                            }}
                         >
                             {laneImages.map((src, imageIndex) => (
                                 <div

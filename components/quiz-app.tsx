@@ -7,7 +7,7 @@ import { SingleImageQuestion } from "@/components/single-image-question";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import type { ChoiceKey, DailyChallenge } from "@/data/daily";
+import type { ChoiceKey, DailyChallenge, Question } from "@/data/daily";
 import type { Language } from "@/lib/i18n";
 import { copy, languageLabel, t } from "@/lib/i18n";
 import {
@@ -34,6 +34,22 @@ function createRunSeed() {
     return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function getQuestionImageSources(question?: Question) {
+    if (!question) return [];
+
+    if (question.mode === "pair") {
+        return [question.a.src, question.b.src].filter((src): src is string => Boolean(src));
+    }
+
+    return question.image.src ? [question.image.src] : [];
+}
+
+function preloadImageSource(src: string) {
+    const image = new window.Image();
+    image.decoding = "async";
+    image.src = src;
+}
+
 export function QuizApp({ challenge }: QuizAppProps) {
     const [language, setLanguage] = useState<Language>("en");
     const [runSeed, setRunSeed] = useState<string | null>(null);
@@ -43,6 +59,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
     const [revealed, setRevealed] = useState(false);
     const [invite, setInvite] = useState<InviteContext | null>(null);
     const quizRef = useRef<HTMLElement>(null);
+    const preloadedImageSourcesRef = useRef<Set<string>>(new Set());
     const c = copy[language];
     const maxQuestionsPerRun = challenge.questions.length;
     const initialQuestionsPerRun = Math.min(DEFAULT_QUESTIONS_PER_RUN, maxQuestionsPerRun);
@@ -101,9 +118,36 @@ export function QuizApp({ challenge }: QuizAppProps) {
         }
     }, []);
 
+    useEffect(() => {
+        questions
+            .slice(index, index + 2)
+            .flatMap((entry) => getQuestionImageSources(entry))
+            .forEach((src) => {
+                if (preloadedImageSourcesRef.current.has(src)) {
+                    return;
+                }
+
+                preloadedImageSourcesRef.current.add(src);
+                preloadImageSource(src);
+            });
+    }, [index, questions]);
+
     function startRun(seed = createRunSeed(), count = questionsPerRun) {
         const nextCount = Math.min(Math.max(count, 1), maxQuestionsPerRun);
         if (maxQuestionsPerRun === 0) return;
+
+        pickQuestionBatch(challenge.questions, nextCount, `${challenge.day}-${seed}`)
+            .slice(0, 2)
+            .flatMap((entry) => getQuestionImageSources(entry))
+            .forEach((src) => {
+                if (preloadedImageSourcesRef.current.has(src)) {
+                    return;
+                }
+
+                preloadedImageSourcesRef.current.add(src);
+                preloadImageSource(src);
+            });
+
         setSelectedQuestionCount(nextCount);
         setRunSeed(seed);
         setIndex(0);
@@ -348,7 +392,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                     </div>
 
                     {question.mode === "pair" ? (
-                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4" key={question.id}>
                             <ImageChoice
                                 choice={question.a}
                                 label="A"
@@ -372,6 +416,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                         </div>
                     ) : (
                         <SingleImageQuestion
+                            key={question.id}
                             question={question}
                             selected={selected === "ai" || selected === "real" ? selected : undefined}
                             revealed={revealed}

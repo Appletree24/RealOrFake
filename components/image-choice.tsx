@@ -7,7 +7,7 @@ import { copy, t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Maximize2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ImageChoiceProps = {
     choice: ImageChoiceType;
@@ -18,19 +18,6 @@ type ImageChoiceProps = {
     disabled: boolean;
     language: Language;
     onSelect: (choice: PairChoiceKey) => void;
-};
-
-const paletteClass: Record<ImageChoiceType["palette"], string> = {
-    warm:
-        "from-[#d8b68d] via-[#88715e] to-[#2e2823] before:bg-[#f1d6b8]/55 after:bg-[#17110e]/35",
-    cool:
-        "from-[#b9c3c8] via-[#53616b] to-[#171c22] before:bg-[#e7edf0]/55 after:bg-[#101821]/35",
-    neutral:
-        "from-[#d0ccc4] via-[#7c776f] to-[#24211f] before:bg-[#efebe3]/50 after:bg-[#111]/30",
-    green:
-        "from-[#c8d0bb] via-[#66765f] to-[#1f2c24] before:bg-[#e6eadb]/50 after:bg-[#0f1c15]/35",
-    rose:
-        "from-[#dfb5a8] via-[#93675f] to-[#2b2020] before:bg-[#f3d4c9]/50 after:bg-[#201212]/30"
 };
 
 export function ImageChoice({
@@ -45,6 +32,7 @@ export function ImageChoice({
 }: ImageChoiceProps) {
     const c = copy[language];
     const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
     const stateClass =
         revealed && correct
@@ -56,6 +44,10 @@ export function ImageChoice({
                     : "hover:-translate-y-0.5 hover:shadow-soft-line";
 
     const altText = t(choice.alt, language);
+
+    useEffect(() => {
+        setLoaded(false);
+    }, [choice.src]);
 
     return (
         <>
@@ -79,27 +71,34 @@ export function ImageChoice({
                     )}
                 >
                     {choice.src ? (
+                        <div
+                            aria-hidden="true"
+                            className={cn(
+                                "absolute inset-0 flex items-center justify-center bg-stone-950/90 transition duration-300",
+                                loaded ? "opacity-0" : "opacity-100"
+                            )}
+                        >
+                            <div className="h-10 w-10 animate-pulse rounded-full border-2 border-white/20 border-t-white/70" />
+                        </div>
+                    ) : null}
+                    {choice.src ? (
                         <Image
+                            key={choice.src}
                             src={choice.src}
                             alt={altText}
                             fill
                             priority
                             quality={82}
                             sizes="(min-width: 1024px) 32vw, 46vw"
-                            className="object-contain transition duration-500 group-hover:scale-[1.015]"
+                            className={cn(
+                                "object-contain transition duration-500 group-hover:scale-[1.015]",
+                                loaded ? "opacity-100" : "opacity-0"
+                            )}
+                            onLoad={() => setLoaded(true)}
                         />
                     ) : (
-                        <div
-                            className={cn(
-                                "relative h-full w-full bg-gradient-to-br",
-                                "before:absolute before:left-[12%] before:top-[12%] before:h-[42%] before:w-[48%] before:rounded-full before:blur-2xl",
-                                "after:absolute after:bottom-[10%] after:right-[8%] after:h-[36%] after:w-[42%] after:rounded-full after:blur-2xl",
-                                paletteClass[choice.palette]
-                            )}
-                        >
-                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
-                            <div className="absolute left-[14%] top-[20%] h-[42%] w-[58%] border border-white/20 bg-white/10 backdrop-blur-[1px]" />
-                            <div className="absolute bottom-[18%] right-[14%] h-[18%] w-[38%] border border-white/15 bg-black/10" />
+                        <div className="relative flex h-full w-full items-center justify-center bg-stone-950/90">
+                            <div className="h-10 w-10 rounded-full border-2 border-white/15" />
                         </div>
                     )}
                 </button>

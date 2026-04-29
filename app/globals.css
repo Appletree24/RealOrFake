@@ -78,15 +78,15 @@ a {
 }
 
 .animate-homepage-drift-slow {
-  animation: homepage-drift-left 40s linear infinite;
+  animation: homepage-drift-left 54s linear infinite;
 }
 
 .animate-homepage-drift-medium {
-  animation: homepage-drift-left 32s linear infinite;
+  animation: homepage-drift-left 44s linear infinite;
 }
 
 .animate-homepage-drift-reverse {
-  animation: homepage-drift-right 36s linear infinite;
+  animation: homepage-drift-right 50s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
