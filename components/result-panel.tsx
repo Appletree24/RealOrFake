@@ -107,6 +107,25 @@ export function ResultPanel({
         setNicknameDialogOpen(true);
     }
 
+    function buildCurrentInviteLink() {
+        return buildInviteUrl(window.location.origin, window.location.pathname, {
+            nickname: sanitizeNickname(nicknameDraft),
+            score,
+            total,
+            day: challenge.day,
+            category
+        });
+    }
+
+    async function quickCopyInviteLink() {
+        const copied = await copyToClipboard(buildCurrentInviteLink());
+        if (copied) {
+            showToast("success", c.linkCopied);
+        } else {
+            showToast("error", c.copyFailed);
+        }
+    }
+
     function dismissEmailCapture() {
         window.localStorage.setItem(EMAIL_CAPTURE_DISMISSED_KEY, "1");
         setEmailCaptureVisible(false);
@@ -321,10 +340,14 @@ export function ResultPanel({
                 </Button>
             </div>
 
-            <div className="mt-5 flex items-center justify-center gap-2 text-sm text-muted">
+            <button
+                className="mt-5 inline-flex items-center justify-center gap-2 self-center rounded-full px-3 py-2 text-sm text-muted transition hover:bg-white/50 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                onClick={() => void quickCopyInviteLink()}
+                type="button"
+            >
                 <Copy className="h-4 w-4" />
                 {c.linkReady}
-            </div>
+            </button>
 
             {toast ? (
                 <div

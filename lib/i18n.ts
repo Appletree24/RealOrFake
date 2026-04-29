@@ -164,7 +164,7 @@ export const copy = {
         emailCaptureTitle: "想先拿到更难的新题包吗？",
         emailCaptureBody:
             "留下邮箱，后续新场景、进阶难度题组和产品更新会优先发给你。",
-        emailCaptureHint: "不会高频打扰，只发有用更新。",
+        emailCaptureHint: "不会高频打扰您的邮箱，只发送最新最有用的新题目以及识别AI图片的小技巧。",
         emailPlaceholder: "you@example.com",
         emailSubmit: "抢先获取",
         emailDismiss: "暂时不用",
