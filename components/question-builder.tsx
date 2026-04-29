@@ -725,7 +725,7 @@ function ImageSection<TImage extends { src: string; alt: LocalizedDraft; palette
                             />
                         </label>
                         <p className="text-xs leading-5 text-muted">
-                            选择后会自动上传到项目 `public/quiz` 并回填路径。
+                            选择后会自动上传到项目 `public/quiz`，转成 `webp` 并回填路径。
                         </p>
                     </div>
                     {uploadStatus.message ? (

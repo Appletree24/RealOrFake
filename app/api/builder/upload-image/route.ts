@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 
 export const runtime = "nodejs";
 
 const allowedExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif"]);
+const execFileAsync = promisify(execFile);
 
 function sanitizeSegment(value: string) {
     const normalized = value
@@ -51,16 +55,42 @@ export async function POST(request: Request) {
     const directory = assetDirectoryFor(categoryId);
     const safeQuestionId = sanitizeSegment(questionId);
     const safeSlot = slot === "image" ? "" : `-${sanitizeSegment(slot)}`;
-    const fileName = `${safeQuestionId}${safeSlot}${extension}`;
+    const fileName = `${safeQuestionId}${safeSlot}.webp`;
     const outputDirectory = path.join(process.cwd(), "public", "quiz", directory);
     const outputPath = path.join(outputDirectory, fileName);
+    const tempDirectory = await mkdtemp(path.join(tmpdir(), "realorfake-upload-"));
+    const tempInputPath = path.join(tempDirectory, `input${extension}`);
+    const tempPngPath = path.join(tempDirectory, "input.png");
 
-    await mkdir(outputDirectory, { recursive: true });
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(outputPath, buffer);
+    try {
+        await mkdir(outputDirectory, { recursive: true });
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await writeFile(tempInputPath, buffer);
 
-    return NextResponse.json({
-        ok: true,
-        src: `/quiz/${directory}/${fileName}`
-    });
+        let conversionInput = tempInputPath;
+        if (extension === ".avif") {
+            await execFileAsync("sips", ["-s", "format", "png", tempInputPath, "--out", tempPngPath]);
+            conversionInput = tempPngPath;
+        }
+
+        await execFileAsync("/opt/homebrew/bin/cwebp", [
+            "-q",
+            "82",
+            conversionInput,
+            "-o",
+            outputPath
+        ]);
+
+        return NextResponse.json({
+            ok: true,
+            src: `/quiz/${directory}/${fileName}`
+        });
+    } catch {
+        return NextResponse.json(
+            { error: "Failed to convert the uploaded image to webp." },
+            { status: 500 }
+        );
+    } finally {
+        await rm(tempDirectory, { recursive: true, force: true });
+    }
 }

@@ -10,7 +10,7 @@ import {
     buildInviteUrl,
     sanitizeNickname
 } from "@/lib/share-context";
-import { Check, Copy, RotateCcw, Share2, X } from "lucide-react";
+import { Check, Copy, Mail, RotateCcw, Share2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type ResultPanelProps = {
@@ -24,7 +24,10 @@ type ResultPanelProps = {
 };
 
 const NICKNAME_STORAGE_KEY = "ai-photo-nickname";
+const EMAIL_CAPTURE_DISMISSED_KEY = "ai-photo-email-capture-dismissed";
+const EMAIL_CAPTURE_SUBMITTED_KEY = "ai-photo-email-capture-submitted";
 const TOAST_DURATION_MS = 2800;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 
 async function copyToClipboard(text: string) {
     try {
@@ -68,12 +71,21 @@ export function ResultPanel({
 
     const [nicknameDialogOpen, setNicknameDialogOpen] = useState(false);
     const [nicknameDraft, setNicknameDraft] = useState("");
+    const [emailDraft, setEmailDraft] = useState("");
+    const [emailCaptureVisible, setEmailCaptureVisible] = useState(false);
+    const [emailSubmitting, setEmailSubmitting] = useState(false);
+    const [emailStatus, setEmailStatus] = useState<{ kind: "success" | "error"; text: string } | null>(
+        null
+    );
     const [toast, setToast] = useState<{ kind: "success" | "error"; text: string } | null>(null);
     const toastTimer = useRef<number | null>(null);
 
     useEffect(() => {
         const saved = window.localStorage.getItem(NICKNAME_STORAGE_KEY);
         if (saved) setNicknameDraft(saved);
+        const dismissed = window.localStorage.getItem(EMAIL_CAPTURE_DISMISSED_KEY);
+        const submitted = window.localStorage.getItem(EMAIL_CAPTURE_SUBMITTED_KEY);
+        setEmailCaptureVisible(!dismissed && !submitted);
     }, []);
 
     useEffect(() => {
@@ -93,6 +105,59 @@ export function ResultPanel({
 
     function openShareDialog() {
         setNicknameDialogOpen(true);
+    }
+
+    function dismissEmailCapture() {
+        window.localStorage.setItem(EMAIL_CAPTURE_DISMISSED_KEY, "1");
+        setEmailCaptureVisible(false);
+    }
+
+    async function submitEmailCapture() {
+        const email = emailDraft.trim().toLowerCase();
+        if (!EMAIL_PATTERN.test(email)) {
+            setEmailStatus({ kind: "error", text: c.emailInvalid });
+            return;
+        }
+
+        setEmailSubmitting(true);
+        setEmailStatus(null);
+
+        try {
+            const response = await fetch("/api/capture-email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    language,
+                    score,
+                    total,
+                    day: challenge.day,
+                    category
+                })
+            });
+
+            if (response.status === 409) {
+                window.localStorage.setItem(EMAIL_CAPTURE_SUBMITTED_KEY, email);
+                setEmailStatus({ kind: "success", text: c.emailDuplicate });
+                setEmailCaptureVisible(false);
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("capture failed");
+            }
+
+            window.localStorage.setItem(EMAIL_CAPTURE_SUBMITTED_KEY, email);
+            setEmailStatus({ kind: "success", text: c.emailSuccess });
+            setEmailCaptureVisible(false);
+            showToast("success", c.emailSuccess);
+        } catch {
+            setEmailStatus({ kind: "error", text: c.emailFailed });
+        } finally {
+            setEmailSubmitting(false);
+        }
     }
 
     async function commitShare(rawNickname: string) {
@@ -169,6 +234,81 @@ export function ResultPanel({
                     </p>
                 </div>
             </div>
+
+            {emailCaptureVisible ? (
+                <div className="mt-6 rounded-md border border-line bg-white/80 px-5 py-5 shadow-soft-line">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2 text-accent">
+                                <Mail className="h-4 w-4" />
+                                <p className="text-xs font-semibold uppercase tracking-wide">
+                                    Insider List
+                                </p>
+                            </div>
+                            <p className="mt-3 text-xl font-semibold leading-8 text-ink">
+                                {c.emailCaptureTitle}
+                            </p>
+                            <p className="mt-2 max-w-2xl text-sm leading-7 text-muted">
+                                {c.emailCaptureBody}
+                            </p>
+                        </div>
+                        <button
+                            aria-label={c.emailDismiss}
+                            className="shrink-0 rounded-full p-1 text-muted transition hover:text-ink"
+                            onClick={dismissEmailCapture}
+                            type="button"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+                        <input
+                            className="w-full rounded-md border border-line bg-paper/70 px-3 py-3 text-sm text-ink outline-none placeholder:text-muted focus:border-ink"
+                            inputMode="email"
+                            onChange={(event) => setEmailDraft(event.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    event.preventDefault();
+                                    void submitEmailCapture();
+                                }
+                            }}
+                            placeholder={c.emailPlaceholder}
+                            type="email"
+                            value={emailDraft}
+                        />
+                        <Button
+                            className="whitespace-nowrap"
+                            disabled={emailSubmitting}
+                            onClick={() => void submitEmailCapture()}
+                            size="lg"
+                            type="button"
+                        >
+                            {emailSubmitting ? "..." : c.emailSubmit}
+                        </Button>
+                        <Button
+                            className="whitespace-nowrap"
+                            onClick={dismissEmailCapture}
+                            size="lg"
+                            type="button"
+                            variant="secondary"
+                        >
+                            {c.emailDismiss}
+                        </Button>
+                    </div>
+
+                    <p className="mt-3 text-xs leading-6 text-muted">{c.emailCaptureHint}</p>
+                    {emailStatus ? (
+                        <p
+                            className={`mt-2 text-sm ${
+                                emailStatus.kind === "success" ? "text-accent" : "text-red-600"
+                            }`}
+                        >
+                            {emailStatus.text}
+                        </p>
+                    ) : null}
+                </div>
+            ) : null}
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 <Button onClick={openShareDialog} size="lg">

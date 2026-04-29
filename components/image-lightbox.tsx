@@ -50,7 +50,7 @@ export function ImageLightbox({ open, src, alt, closeLabel, onClose }: ImageLigh
                     event.stopPropagation();
                     onClose();
                 }}
-                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 aria-label={closeLabel}
             >
                 <X className="h-5 w-5" />

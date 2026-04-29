@@ -77,6 +77,17 @@ export const copy = {
         inviteBannerNamed: (name: string, score: number, total: number) =>
             `${name} just scored ${score}/${total}. Can you beat them on the same set?`,
         inviteBannerKicker: "You were invited",
+        emailCaptureTitle: "Want harder image drops before everyone else?",
+        emailCaptureBody:
+            "Leave your email to get early access to new challenge packs, trickier scenes, and future product updates.",
+        emailCaptureHint: "Low volume. Useful updates only.",
+        emailPlaceholder: "you@example.com",
+        emailSubmit: "Get early drops",
+        emailDismiss: "Not now",
+        emailSuccess: "You're in. We'll send the next drops to this inbox.",
+        emailDuplicate: "This email is already on the list.",
+        emailInvalid: "Enter a valid email address.",
+        emailFailed: "Couldn't save your email just now. Please try again.",
         zoomIn: "Zoom in",
         closePreview: "Close preview",
         viewFullImage: "View full image"
@@ -150,6 +161,17 @@ export const copy = {
         inviteBannerNamed: (name: string, score: number, total: number) =>
             `${name} 刚在同一套题里拿下 ${score}/${total} 分，来挑战试试？`,
         inviteBannerKicker: "你被邀请参加挑战",
+        emailCaptureTitle: "想先拿到更难的新题包吗？",
+        emailCaptureBody:
+            "留下邮箱，后续新场景、进阶难度题组和产品更新会优先发给你。",
+        emailCaptureHint: "不会高频打扰，只发有用更新。",
+        emailPlaceholder: "you@example.com",
+        emailSubmit: "抢先获取",
+        emailDismiss: "暂时不用",
+        emailSuccess: "已加入名单，后续新题会优先发到这个邮箱。",
+        emailDuplicate: "这个邮箱已经登记过了。",
+        emailInvalid: "请输入有效的邮箱地址。",
+        emailFailed: "这次保存失败了，请稍后再试。",
         zoomIn: "放大查看",
         closePreview: "关闭预览",
         viewFullImage: "查看大图"
