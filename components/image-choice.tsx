@@ -5,6 +5,7 @@ import type { ImageChoice as ImageChoiceType, PairChoiceKey } from "@/data/daily
 import type { Language } from "@/lib/i18n";
 import { copy, t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { Maximize2 } from "lucide-react";
 import { useState } from "react";
 
@@ -72,15 +73,20 @@ export function ImageChoice({
                     aria-label={altText}
                     className={cn(
                         "absolute inset-0 h-full w-full cursor-pointer",
+                        "relative",
                         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink",
                         "disabled:cursor-default"
                     )}
                 >
                     {choice.src ? (
-                        <img
+                        <Image
                             src={choice.src}
                             alt={altText}
-                            className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.015]"
+                            fill
+                            priority
+                            quality={82}
+                            sizes="(min-width: 1024px) 32vw, 46vw"
+                            className="object-contain transition duration-500 group-hover:scale-[1.015]"
                         />
                     ) : (
                         <div

@@ -6,6 +6,7 @@ import type { SingleChoiceKey, SingleQuestion } from "@/data/daily";
 import type { Language } from "@/lib/i18n";
 import { copy, t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { Maximize2 } from "lucide-react";
 import { useState } from "react";
 
@@ -53,10 +54,14 @@ export function SingleImageQuestion({
                 )}
             >
                 {question.image.src ? (
-                    <img
-                        alt={altText}
-                        className="h-full w-full object-contain"
+                    <Image
                         src={question.image.src}
+                        alt={altText}
+                        fill
+                        priority
+                        quality={82}
+                        sizes="(min-width: 1024px) 40vw, 100vw"
+                        className="object-contain"
                     />
                 ) : (
                     <div

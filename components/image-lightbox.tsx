@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { X } from "lucide-react";
 import { useEffect } from "react";
 
@@ -55,12 +56,19 @@ export function ImageLightbox({ open, src, alt, closeLabel, onClose }: ImageLigh
                 <X className="h-5 w-5" />
             </button>
 
-            <img
-                src={src}
-                alt={alt}
+            <div
                 onClick={(event) => event.stopPropagation()}
-                className="max-h-[92vh] max-w-[92vw] rounded-md object-contain shadow-2xl"
-            />
+                className="relative h-[92vh] w-[92vw]"
+            >
+                <Image
+                    src={src}
+                    alt={alt}
+                    fill
+                    quality={90}
+                    sizes="92vw"
+                    className="rounded-md object-contain shadow-2xl"
+                />
+            </div>
         </div>
     );
 }

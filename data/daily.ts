@@ -273,13 +273,13 @@ export const dailyChallenge: DailyChallenge = {
             title: { en: "Phone-shot concert crowd", zh: "手机拍的演唱会现场" },
             a: {
                 key: "a",
-                src: "/quiz/concert/concert-crowd-001-a.png",
+                src: "/quiz/concert/concert-crowd-001-a.webp",
                 alt: { en: "Concert option A", zh: "演唱会选项 A" },
                 palette: "rose"
             },
             b: {
                 key: "b",
-                src: "/quiz/concert/concert-crowd-001-b.jpg",
+                src: "/quiz/concert/concert-crowd-001-b.webp",
                 alt: { en: "Concert option B", zh: "演唱会选项 B" },
                 palette: "cool"
             },
@@ -301,7 +301,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "City streets", zh: "城市街景" },
             title: { en: "City street after rain", zh: "雨后的街景" },
             image: {
-                src: "/quiz/city-street/city-street-window-001.jpg",
+                src: "/quiz/city-street/city-street-window-001.webp",
                 alt: { en: "City street after rain", zh: "雨后的街景" },
                 palette: "warm"
             },
@@ -323,7 +323,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Food reviews", zh: "探店美食" },
             title: { en: "Night market snack stall", zh: "夜市小吃摊随手拍" },
             image: {
-                src: "/quiz/local-food/street-snack-001.png",
+                src: "/quiz/local-food/street-snack-001.webp",
                 alt: { en: "Night market snack stall", zh: "夜市小吃摊照片" },
                 palette: "warm"
             },
