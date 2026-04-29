@@ -49,11 +49,21 @@ export function SingleImageQuestion({
                     <div
                         aria-hidden="true"
                         className={cn(
-                            "absolute inset-0 flex items-center justify-center bg-stone-950/90 transition duration-300",
+                            "absolute inset-0 overflow-hidden bg-stone-950 transition duration-300",
                             loaded ? "opacity-0" : "opacity-100"
                         )}
                     >
-                        <div className="h-10 w-10 animate-pulse rounded-full border-2 border-white/20 border-t-white/70" />
+                        <Image
+                            key={`${question.image.src}-placeholder`}
+                            src={question.image.src}
+                            alt=""
+                            aria-hidden="true"
+                            fill
+                            quality={30}
+                            sizes="(min-width: 1024px) 40vw, 100vw"
+                            className="scale-110 object-cover blur-2xl brightness-90 saturate-75"
+                        />
+                        <div className="absolute inset-0 bg-black/28" />
                     </div>
                 ) : null}
                 {question.image.src ? (
