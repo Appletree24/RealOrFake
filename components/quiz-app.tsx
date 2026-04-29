@@ -268,7 +268,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                                 {question.mode === "pair" ? c.pairMode : c.singleMode}
                             </Badge>
                         </div>
-                        <h1 className="mt-5 text-3xl font-semibold leading-tight text-ink sm:text-5xl">
+                        <h1 className="mt-5 text-3xl font-semibold leading-tight text-ink md:whitespace-nowrap md:text-4xl lg:text-5xl">
                             {question.mode === "pair" ? c.pairPrompt : c.singlePrompt}
                         </h1>
                         <p className="mt-5 text-lg leading-8 text-muted">

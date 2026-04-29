@@ -259,9 +259,6 @@ export const dailyChallenge: DailyChallenge = {
         zh: "国内传播题库"
     },
     opponentPool: [
-        "Claude Sonnet 4.6",
-        "Gemini 3.1 Pro",
-        "Grok 4",
         "豆包"
     ],
     questions: [
@@ -337,6 +334,93 @@ export const dailyChallenge: DailyChallenge = {
                 en: "It read the night-market clutter and mixed lighting as natural street-life detail, so it called the image real, but that realism was faked.",
                 zh: "它把夜市摊位的杂乱感和混合光线当成了真实生活痕迹，所以判断成真实照片，但这份真实感其实是伪装出来的。"
             }
+        },
+        {
+            id: "y2k-ccd-me-and-doraemon-001",
+            mode: "single",
+            categoryId: "y2k-ccd",
+            category: { en: "Y2K CCD", zh: "千禧年CCD" },
+            title: { en: "Me and doraemon", zh: "我和蓝胖子" },
+            image: {
+                src: "/quiz/y2k-ccd/002.webp",
+                alt: { en: "Me and doraemon", zh: "我和蓝胖子" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "real",
+            explanation: { en: "The overall look is very similar to a CCD flash snapshot, but the lighting and details are too “clean and uniform,” lacking the random noise and color shifts commonly found in authentic vintage cameras.", zh: "整体观感很像CCD直闪快照，但光影与细节过于“干净统一”，缺少真实老相机常见的随机噪点和色偏波动。\n" },
+            llmExplanation: { en: "The photos feature natural film grain and color shifts; the lighting and perspective of the people and models are perfectly aligned, and the background elements show none of the text distortions or logical inconsistencies commonly found in AI-generated images.", zh: "照片具备自然的胶片颗粒与色彩偏差，人物与模型的光影、透视关系完全匹配，背景元素也无 AI 生成常见的文字错乱、逻辑矛盾等问题。" }
+        },
+        {
+            id: "y2k-ccd-me-and-cinnamoroll-001",
+            mode: "single",
+            categoryId: "y2k-ccd",
+            category: { en: "Y2K CCD", zh: "千禧年CCD" },
+            title: { en: "Me and Cinnamoroll", zh: "我和大耳狗" },
+            image: {
+                src: "/quiz/y2k-ccd/y2k-ccd-me-and-cinnamoroll-001.webp",
+                alt: { en: "Me and Cinnamoroll", zh: "我和大耳狗" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "ai",
+            explanation: { en: "The image looks too “smooth and polished”; everything from skin texture to lighting and noise appears to have been meticulously adjusted, lacking the rough, unpredictable quality of a real CCD sensor.", zh: "画面太“均匀讨好”，从肤质到灯光噪点都像被精心调过，缺少真实CCD那种随机翻车的粗糙感。" },
+            llmExplanation: { en: "The character's hands exhibit obvious morphological distortions and fused fingers—typical defects found in AI-generated images. The details of the background objects are blurry and chaotic, and the overall lighting and textures have an unnatural, artificial look.", zh: "人物手部存在明显的形态扭曲、手指融合等典型 AI 生成缺陷，背景设备细节模糊混乱，且整体光影与质感存在不自然的模拟感." }
+        },
+        {
+            id: "y2k-ccd-chinese-street-001",
+            mode: "single",
+            categoryId: "y2k-ccd",
+            category: { en: "Y2K CCD", zh: "千禧年CCD" },
+            title: { en: "Chinese Street", zh: "中国街景" },
+            image: {
+                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-001.webp",
+                alt: { en: "Chinese Street", zh: "中国街景" },
+                palette: "warm"
+            },
+            aiAnswer: false,
+            llmAnswer: "real",
+            explanation: { en: "", zh: "" },
+            llmExplanation: { en: "Authentic vintage photographs capturing street scenes in Wuhan from the 2000s.", zh: "真实拍摄的 2000 年代武汉街景纪实老照片。" }
+        },
+        {
+            id: "y2k-ccd-chinese-street-002",
+            mode: "single",
+            categoryId: "y2k-ccd",
+            category: { en: "Y2K CCD", zh: "千禧年CCD" },
+            title: { en: "Chinese Street", zh: "中国街景" },
+            image: {
+                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-002.webp",
+                alt: { en: "Chinese Street", zh: "中国街景" },
+                palette: "warm"
+            },
+            aiAnswer: true,
+            llmAnswer: "real",
+            explanation: { en: "", zh: "" },
+            llmExplanation: { en: "The shooting date “7 24 '00” in the bottom right corner, along with iconic landmarks such as the Cathay Cinema and the Shanghai Customs Building, as well as the 2000s-era cars, street signs, and pedestrians’ attire, all align with the urban landscape of Shanghai at that time. The lighting, perspective, and attention to detail are natural, with none of the typical flaws associated with AI-generated imagery.", zh: "右下角带有 “7 24 '00” 的拍摄日期，画面里的国泰电影院、上海海关大楼等标志性场景，以及 2000 年代的车型、街景招牌和行人穿搭，均与当时的上海城市风貌吻合，光影、透视与细节逻辑自然，无 AI 生成的典型瑕疵" }
+        },
+        {
+            id: "y2k-ccd-chinese-street-003",
+            mode: "pair",
+            categoryId: "y2k-ccd",
+            category: { en: "Y2K CCD", zh: "千禧年CCD" },
+            title: { en: "Chinese Street", zh: "中国街景" },
+            a: {
+                key: "a",
+                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-003-a.webp",
+                alt: { en: "Chinese Street A", zh: "中国街景 A" },
+                palette: "warm"
+            },
+            b: {
+                key: "b",
+                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-003-b.webp",
+                alt: { en: "Chinese Street B", zh: "中国街景 B" },
+                palette: "cool"
+            },
+            aiAnswer: "b",
+            llmAnswer: "a",
+            explanation: { en: "The details of the era are “too uniform and pristine,” resembling retro memories curated by an algorithm rather than the slightly chaotic and serendipitous street scenes of the real world.", zh: "时代细节“过于统一且干净”，像是被算法整理过的复古记忆，而不是真实世界里那种略带混乱与偶然性的街景。" },
+            llmExplanation: { en: "Taken by photographer Demuri Riyu in 1983, these photographs serve as authentic documentary images of the streetscape of Shanghai’s Nanjing East Road at that time, as the photographer, date, location, and details such as the architecture, traffic, and signage are all supported by reliable historical evidence.", zh: "由摄影师出目里利吕井 1983 年拍摄的照片，因拍摄者、时间、地点及建筑、交通、招牌等细节均有可靠历史佐证，是记录当时上海南京东路街景的真实纪实影像。" }
         }
     ]
 };
