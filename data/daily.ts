@@ -35,7 +35,7 @@ export type ImageChoice = {
 
 export type BaseQuestion = {
     id: string;
-    categoryId: Exclude<CategoryId, "all">;
+    categoryId: CategoryId;
     category: LocalizedText;
     title: LocalizedText;
     explanation: LocalizedText;
@@ -270,13 +270,13 @@ export const dailyChallenge: DailyChallenge = {
             title: { en: "Phone-shot concert crowd", zh: "手机拍的演唱会现场" },
             a: {
                 key: "a",
-                src: "/quiz/concert/concert-crowd-001-a.webp",
+                src: "/quiz/library/concert-crowd-001-a.webp",
                 alt: { en: "Concert option A", zh: "演唱会选项 A" },
                 palette: "rose"
             },
             b: {
                 key: "b",
-                src: "/quiz/concert/concert-crowd-001-b.webp",
+                src: "/quiz/library/concert-crowd-001-b.webp",
                 alt: { en: "Concert option B", zh: "演唱会选项 B" },
                 palette: "cool"
             },
@@ -298,7 +298,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "City streets", zh: "城市街景" },
             title: { en: "City street after rain", zh: "雨后的街景" },
             image: {
-                src: "/quiz/city-street/city-street-window-001.webp",
+                src: "/quiz/library/city-street-window-001.webp",
                 alt: { en: "City street after rain", zh: "雨后的街景" },
                 palette: "warm"
             },
@@ -320,7 +320,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Food reviews", zh: "探店美食" },
             title: { en: "Night market snack stall", zh: "夜市小吃摊随手拍" },
             image: {
-                src: "/quiz/local-food/street-snack-001.webp",
+                src: "/quiz/library/street-snack-001.webp",
                 alt: { en: "Night market snack stall", zh: "夜市小吃摊照片" },
                 palette: "warm"
             },
@@ -342,7 +342,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Y2K CCD", zh: "千禧年CCD" },
             title: { en: "Me and doraemon", zh: "我和蓝胖子" },
             image: {
-                src: "/quiz/y2k-ccd/002.webp",
+                src: "/quiz/library/002.webp",
                 alt: { en: "Me and doraemon", zh: "我和蓝胖子" },
                 palette: "warm"
             },
@@ -358,7 +358,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Y2K CCD", zh: "千禧年CCD" },
             title: { en: "Me and Cinnamoroll", zh: "我和大耳狗" },
             image: {
-                src: "/quiz/y2k-ccd/y2k-ccd-me-and-cinnamoroll-001.webp",
+                src: "/quiz/library/y2k-ccd-me-and-cinnamoroll-001.webp",
                 alt: { en: "Me and Cinnamoroll", zh: "我和大耳狗" },
                 palette: "warm"
             },
@@ -374,7 +374,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Y2K CCD", zh: "千禧年CCD" },
             title: { en: "Chinese Street", zh: "中国街景" },
             image: {
-                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-001.webp",
+                src: "/quiz/library/y2k-ccd-chinese-street-001.webp",
                 alt: { en: "Chinese Street", zh: "中国街景" },
                 palette: "warm"
             },
@@ -390,7 +390,7 @@ export const dailyChallenge: DailyChallenge = {
             category: { en: "Y2K CCD", zh: "千禧年CCD" },
             title: { en: "Chinese Street", zh: "中国街景" },
             image: {
-                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-002.webp",
+                src: "/quiz/library/y2k-ccd-chinese-street-002.webp",
                 alt: { en: "Chinese Street", zh: "中国街景" },
                 palette: "warm"
             },
@@ -407,13 +407,13 @@ export const dailyChallenge: DailyChallenge = {
             title: { en: "Chinese Street", zh: "中国街景" },
             a: {
                 key: "a",
-                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-003-a.webp",
+                src: "/quiz/library/y2k-ccd-chinese-street-003-a.webp",
                 alt: { en: "Chinese Street A", zh: "中国街景 A" },
                 palette: "warm"
             },
             b: {
                 key: "b",
-                src: "/quiz/y2k-ccd/y2k-ccd-chinese-street-003-b.webp",
+                src: "/quiz/library/y2k-ccd-chinese-street-003-b.webp",
                 alt: { en: "Chinese Street B", zh: "中国街景 B" },
                 palette: "cool"
             },

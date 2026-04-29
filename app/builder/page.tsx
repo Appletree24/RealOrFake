@@ -1,5 +1,5 @@
 import { QuestionBuilder } from "@/components/question-builder";
-import { categoryDeck, dailyChallenge, type CategoryId } from "@/data/daily";
+import { dailyChallenge } from "@/data/daily";
 import type { Metadata } from "next";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
@@ -42,18 +42,6 @@ export default async function BuilderPage() {
     const imageRoot = path.join(process.cwd(), "public", "quiz");
     const imagePaths = await collectImagePaths(imageRoot);
     const existingIds = dailyChallenge.questions.map((question) => question.id);
-    const categories = categoryDeck
-        .filter((category): category is typeof categoryDeck[number] & { id: Exclude<CategoryId, "all"> } => category.id !== "all")
-        .map((category) => ({
-            id: category.id,
-            label: category.label
-        }));
 
-    return (
-        <QuestionBuilder
-            categories={categories}
-            imagePaths={imagePaths}
-            existingIds={existingIds}
-        />
-    );
+    return <QuestionBuilder imagePaths={imagePaths} existingIds={existingIds} />;
 }

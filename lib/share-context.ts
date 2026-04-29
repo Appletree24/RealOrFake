@@ -4,10 +4,12 @@ export type InviteContext = {
     total: number;
     day?: string;
     category?: string;
+    runSeed?: string;
 };
 
 const MAX_NICKNAME_LENGTH = 24;
 const CATEGORY_PATTERN = /^[a-z0-9-]{1,32}$/;
+const RUN_SEED_PATTERN = /^[a-z0-9]{6,32}$/;
 
 function sanitizeNickname(value: string | null | undefined) {
     if (!value) return undefined;
@@ -20,6 +22,13 @@ function sanitizeCategory(value: string | null | undefined) {
     if (!value) return undefined;
     const trimmed = value.trim().toLowerCase();
     if (!CATEGORY_PATTERN.test(trimmed)) return undefined;
+    return trimmed;
+}
+
+function sanitizeRunSeed(value: string | null | undefined) {
+    if (!value) return undefined;
+    const trimmed = value.trim().toLowerCase();
+    if (!RUN_SEED_PATTERN.test(trimmed)) return undefined;
     return trimmed;
 }
 
@@ -42,8 +51,9 @@ export function parseInviteFromSearch(search: string): InviteContext | null {
     const nickname = sanitizeNickname(params.get("ref"));
     const day = params.get("d") ?? undefined;
     const category = sanitizeCategory(params.get("cat"));
+    const runSeed = sanitizeRunSeed(params.get("set"));
 
-    return { nickname, score, total, day, category };
+    return { nickname, score, total, day, category, runSeed };
 }
 
 export function buildInviteUrl(
@@ -63,9 +73,13 @@ export function buildInviteUrl(
         const clean = sanitizeCategory(context.category);
         if (clean) params.set("cat", clean);
     }
+    if (context.runSeed) {
+        const clean = sanitizeRunSeed(context.runSeed);
+        if (clean) params.set("set", clean);
+    }
 
     const base = `${origin}${pathname}`;
     return `${base}?${params.toString()}`;
 }
 
-export { MAX_NICKNAME_LENGTH, sanitizeCategory, sanitizeNickname };
+export { MAX_NICKNAME_LENGTH, sanitizeCategory, sanitizeNickname, sanitizeRunSeed };

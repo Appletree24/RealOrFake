@@ -83,6 +83,29 @@ export function interleaveQuestions(questions: Question[], seed: string): Questi
     return merged;
 }
 
+function createSeededRandom(seed: string) {
+    let state = hashSeed(seed) || 1;
+    return () => {
+        state = (state * 1664525 + 1013904223) >>> 0;
+        return state / 4294967296;
+    };
+}
+
+export function pickQuestionBatch(questions: Question[], count: number, seed: string): Question[] {
+    if (questions.length <= 1) return [...questions];
+
+    const random = createSeededRandom(seed);
+    const shuffled = [...questions];
+
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(random() * (index + 1));
+        [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
+
+    const batch = shuffled.slice(0, Math.min(count, shuffled.length));
+    return interleaveQuestions(batch, seed);
+}
+
 export function mockWrongRate(questionId: string) {
     const seed = questionId.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
     return 42 + (seed % 43);

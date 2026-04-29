@@ -4,16 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { CategoryId, ImagePalette, PairChoiceKey, SingleChoiceKey } from "@/data/daily";
 import { useEffect, useMemo, useState } from "react";
 
-type BuilderCategory = {
-    id: Exclude<CategoryId, "all">;
-    label: {
-        en: string;
-        zh: string;
-    };
-};
-
 type QuestionBuilderProps = {
-    categories: BuilderCategory[];
     imagePaths: string[];
     existingIds: string[];
 };
@@ -45,8 +36,13 @@ type UploadStatus = {
 };
 
 const imagePalettes: ImagePalette[] = ["warm", "cool", "neutral", "green", "rose"];
-
-const defaultCategory = "concert" satisfies Exclude<CategoryId, "all">;
+const mixedPoolCategory = {
+    id: "all" as CategoryId,
+    label: {
+        zh: "混合题池",
+        en: "Mixed pool"
+    }
+};
 
 function createLocalizedDraft(zh: string, en: string): LocalizedDraft {
     return { zh, en };
@@ -120,9 +116,8 @@ function nextSequenceForPrefix(prefix: string, existingIds: string[]) {
     return String(max + 1).padStart(3, "0");
 }
 
-export function QuestionBuilder({ categories, imagePaths, existingIds }: QuestionBuilderProps) {
+export function QuestionBuilder({ imagePaths, existingIds }: QuestionBuilderProps) {
     const [mode, setMode] = useState<BuilderMode>("single");
-    const [categoryId, setCategoryId] = useState<Exclude<CategoryId, "all">>(defaultCategory);
     const [id, setId] = useState("");
     const [customId, setCustomId] = useState(false);
     const [title, setTitle] = useState<LocalizedDraft>(
@@ -163,23 +158,19 @@ export function QuestionBuilder({ categories, imagePaths, existingIds }: Questio
         image: { state: "idle", message: "" }
     });
 
-    const category = useMemo(
-        () => categories.find((item) => item.id === categoryId) ?? categories[0],
-        [categories, categoryId]
-    );
     const suggestedId = useMemo(() => {
         const topicSlug = slugify(title.en);
-        const prefix = `${category.id}-${topicSlug}`;
+        const prefix = topicSlug;
         return `${prefix}-${nextSequenceForPrefix(prefix, usedIds)}`;
-    }, [category.id, title.en, usedIds]);
+    }, [title.en, usedIds]);
 
     const generatedCode = useMemo(() => {
         const baseLines = [
             "{",
             `    id: ${formatString(id || "new-question-id")},`,
             `    mode: ${formatString(mode)},`,
-            `    categoryId: ${formatString(category.id)},`,
-            `    category: ${formatLocalizedText(category.label)},`,
+            `    categoryId: ${formatString(mixedPoolCategory.id)},`,
+            `    category: ${formatLocalizedText(mixedPoolCategory.label)},`,
             `    title: ${formatLocalizedText(title)},`
         ];
 
@@ -207,7 +198,6 @@ export function QuestionBuilder({ categories, imagePaths, existingIds }: Questio
     }, [
         aiAnswerPair,
         aiAnswerSingle,
-        category,
         explanation,
         id,
         llmAnswerPair,
@@ -287,7 +277,6 @@ export function QuestionBuilder({ categories, imagePaths, existingIds }: Questio
         try {
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("categoryId", categoryId);
             formData.append("questionId", currentId);
             formData.append("slot", slot);
 
@@ -350,7 +339,8 @@ export function QuestionBuilder({ categories, imagePaths, existingIds }: Questio
                     新建题目工坊
                 </h1>
                 <p className="mt-4 max-w-3xl text-sm leading-7 text-muted sm:text-base">
-                    选择单图或双图模式，填写文案与图片路径，右侧会实时生成可直接粘贴到
+                    选择单图或双图模式，填写文案与图片路径。所有新图都会统一上传到
+                    `public/quiz/library`，右侧会实时生成可直接粘贴到
                     `daily.ts` 的题目对象。
                 </p>
             </div>
@@ -392,36 +382,21 @@ export function QuestionBuilder({ categories, imagePaths, existingIds }: Questio
                                         setId(nextId);
                                         setCustomId(nextId.trim() !== "" && nextId.trim() !== suggestedId);
                                     }}
-                                    placeholder="例如：concert-crowd-002"
+                                    placeholder="例如：night-market-snack-001"
                                 />
                                 <p className="mt-2 break-all text-xs leading-5 text-muted">
-                                    自动建议：`{suggestedId}`。规则为 `categoryId-title-slug-001`，默认跟随分类和英文标题变化。
+                                    自动建议：`{suggestedId}`。规则为 `title-slug-001`，默认跟随英文标题变化。
                                 </p>
                             </label>
                         </div>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <label className="block min-w-0">
-                                <span className="mb-2 block text-sm font-medium text-ink">分类 ID</span>
-                                <select
-                                    className={inputClassName()}
-                                    value={categoryId}
-                                    onChange={(event) =>
-                                        setCategoryId(event.target.value as Exclude<CategoryId, "all">)
-                                    }
-                                >
-                                    {categories.map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.id}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            <div className="min-w-0 rounded-md border border-line bg-paper/70 px-4 py-3">
-                                <p className="text-xs uppercase tracking-wide text-muted">分类文案</p>
-                                <p className="mt-2 text-sm font-medium text-ink">{category.label.zh}</p>
-                                <p className="break-words text-sm text-muted">{category.label.en}</p>
-                            </div>
+                        <div className="min-w-0 rounded-md border border-line bg-paper/70 px-4 py-3">
+                            <p className="text-xs uppercase tracking-wide text-muted">题池信息</p>
+                            <p className="mt-2 text-sm font-medium text-ink">{mixedPoolCategory.label.zh}</p>
+                            <p className="break-words text-sm text-muted">{mixedPoolCategory.label.en}</p>
+                            <p className="mt-2 text-xs leading-5 text-muted">
+                                新建题目会自动写入 `categoryId: "all"`，前台不再按分类展示。
+                            </p>
                         </div>
 
                         <LocalizedFields
@@ -611,7 +586,7 @@ export function QuestionBuilder({ categories, imagePaths, existingIds }: Questio
                         <p className="font-medium text-paper">开发建议</p>
                         <p className="mt-2">
                             有真实图的题型优先用 `pair`，没有真实图的题型先用 `single`。图片路径可以直接引用
-                            `public/quiz` 下已有资源，例如 `/quiz/concert/example.webp`。
+                            `public/quiz` 下已有资源，后续新上传会统一写到 `/quiz/library/...`。
                         </p>
                     </div>
                 </section>
@@ -703,7 +678,7 @@ function ImageSection<TImage extends { src: string; alt: LocalizedDraft; palette
                         className={controlClassName}
                         value={image.src}
                         onChange={(event) => onChange({ ...image, src: event.target.value })}
-                        placeholder="/quiz/your-folder/your-image.webp"
+                        placeholder="/quiz/library/your-image.webp"
                         list={imageListId}
                     />
                 </label>
@@ -725,7 +700,7 @@ function ImageSection<TImage extends { src: string; alt: LocalizedDraft; palette
                             />
                         </label>
                         <p className="text-xs leading-5 text-muted">
-                            选择后会自动上传到项目 `public/quiz`，转成 `webp` 并回填路径。
+                            选择后会自动上传到项目 `public/quiz/library`，转成 `webp` 并回填路径。
                         </p>
                     </div>
                     {uploadStatus.message ? (

@@ -9,6 +9,7 @@ export const runtime = "nodejs";
 
 const allowedExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif"]);
 const execFileAsync = promisify(execFile);
+const LIBRARY_DIRECTORY = "library";
 
 function sanitizeSegment(value: string) {
     const normalized = value
@@ -21,15 +22,9 @@ function sanitizeSegment(value: string) {
     return normalized || "question";
 }
 
-function assetDirectoryFor(categoryId: string) {
-    if (categoryId === "photo-booth") return "city-street";
-    return sanitizeSegment(categoryId);
-}
-
 export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file");
-    const categoryId = String(formData.get("categoryId") ?? "").trim();
     const questionId = String(formData.get("questionId") ?? "").trim();
     const slot = String(formData.get("slot") ?? "").trim();
 
@@ -37,9 +32,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "No image file received." }, { status: 400 });
     }
 
-    if (!categoryId || !questionId || !slot) {
+    if (!questionId || !slot) {
         return NextResponse.json(
-            { error: "Missing category, question id, or image slot." },
+            { error: "Missing question id or image slot." },
             { status: 400 }
         );
     }
@@ -52,11 +47,10 @@ export async function POST(request: Request) {
         );
     }
 
-    const directory = assetDirectoryFor(categoryId);
     const safeQuestionId = sanitizeSegment(questionId);
     const safeSlot = slot === "image" ? "" : `-${sanitizeSegment(slot)}`;
     const fileName = `${safeQuestionId}${safeSlot}.webp`;
-    const outputDirectory = path.join(process.cwd(), "public", "quiz", directory);
+    const outputDirectory = path.join(process.cwd(), "public", "quiz", LIBRARY_DIRECTORY);
     const outputPath = path.join(outputDirectory, fileName);
     const tempDirectory = await mkdtemp(path.join(tmpdir(), "realorfake-upload-"));
     const tempInputPath = path.join(tempDirectory, `input${extension}`);
@@ -83,7 +77,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             ok: true,
-            src: `/quiz/${directory}/${fileName}`
+            src: `/quiz/${LIBRARY_DIRECTORY}/${fileName}`
         });
     } catch {
         return NextResponse.json(

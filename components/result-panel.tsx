@@ -18,7 +18,7 @@ type ResultPanelProps = {
     score: number;
     llmScore: number;
     opponentName: string;
-    category?: string;
+    runSeed?: string;
     language: Language;
     onRestart: () => void;
 };
@@ -59,7 +59,7 @@ export function ResultPanel({
     score,
     llmScore,
     opponentName,
-    category,
+    runSeed,
     language,
     onRestart
 }: ResultPanelProps) {
@@ -113,7 +113,7 @@ export function ResultPanel({
             score,
             total,
             day: challenge.day,
-            category
+            runSeed
         });
     }
 
@@ -152,8 +152,7 @@ export function ResultPanel({
                     language,
                     score,
                     total,
-                    day: challenge.day,
-                    category
+                    day: challenge.day
                 })
             });
 
@@ -190,7 +189,7 @@ export function ResultPanel({
             score,
             total,
             day: challenge.day,
-            category
+            runSeed
         });
 
         setNicknameDialogOpen(false);

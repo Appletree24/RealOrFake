@@ -1,22 +1,20 @@
 "use client";
 
-import { CategoryShowcase } from "@/components/category-showcase";
 import { ImageChoice } from "@/components/image-choice";
 import { ResultPanel } from "@/components/result-panel";
 import { SingleImageQuestion } from "@/components/single-image-question";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import type { CategoryId, ChoiceKey, DailyChallenge } from "@/data/daily";
-import { categoryDeck } from "@/data/daily";
+import type { ChoiceKey, DailyChallenge } from "@/data/daily";
 import type { Language } from "@/lib/i18n";
 import { copy, languageLabel, t } from "@/lib/i18n";
 import {
     correctChoiceFor,
-    interleaveQuestions,
     isLlmCorrect,
     mockWrongRate,
     opponentNameForChallenge,
+    pickQuestionBatch,
     scoreAnswers,
     scoreLlmAnswers
 } from "@/lib/quiz";
@@ -28,9 +26,15 @@ type QuizAppProps = {
     challenge: DailyChallenge;
 };
 
+const QUESTIONS_PER_RUN = 5;
+
+function createRunSeed() {
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export function QuizApp({ challenge }: QuizAppProps) {
     const [language, setLanguage] = useState<Language>("en");
-    const [activeCategory, setActiveCategory] = useState<CategoryId>("all");
+    const [runSeed, setRunSeed] = useState<string | null>(null);
     const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
     const [index, setIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, ChoiceKey>>({});
@@ -38,28 +42,12 @@ export function QuizApp({ challenge }: QuizAppProps) {
     const [invite, setInvite] = useState<InviteContext | null>(null);
     const quizRef = useRef<HTMLElement>(null);
     const c = copy[language];
-    const playableCategories = useMemo(() => {
-        const ids = new Set<CategoryId>(["all"]);
-        for (const question of challenge.questions) {
-            ids.add(question.categoryId);
-        }
-        return ids;
-    }, [challenge.questions]);
-    const visibleCategories = useMemo(
-        () =>
-            categoryDeck.filter(
-                (category) => category.id === "all" || category.locked || playableCategories.has(category.id)
-            ),
-        [playableCategories]
-    );
+    const questionsPerRun = Math.min(QUESTIONS_PER_RUN, challenge.questions.length);
 
     const questions = useMemo(() => {
-        const filtered =
-            activeCategory === "all"
-                ? challenge.questions
-                : challenge.questions.filter((question) => question.categoryId === activeCategory);
-        return interleaveQuestions(filtered, `${challenge.day}-${activeCategory}`);
-    }, [activeCategory, challenge.questions, challenge.day]);
+        if (!runSeed) return [];
+        return pickQuestionBatch(challenge.questions, questionsPerRun, `${challenge.day}-${runSeed}`);
+    }, [challenge.day, challenge.questions, questionsPerRun, runSeed]);
     const activeChallenge = useMemo(
         () => ({ ...challenge, questions }),
         [challenge, questions]
@@ -73,10 +61,10 @@ export function QuizApp({ challenge }: QuizAppProps) {
     );
     const llmScore = useMemo(() => scoreLlmAnswers(questions), [questions]);
     const opponentName = useMemo(
-        () => opponentNameForChallenge(challenge, activeCategory),
-        [activeCategory, challenge]
+        () => opponentNameForChallenge(challenge, runSeed ?? challenge.day),
+        [challenge, runSeed]
     );
-    const progress = ((index + (revealed ? 1 : 0)) / questions.length) * 100;
+    const progress = questions.length === 0 ? 0 : ((index + (revealed ? 1 : 0)) / questions.length) * 100;
 
     useEffect(() => {
         const saved = window.localStorage.getItem("ai-photo-language");
@@ -90,52 +78,9 @@ export function QuizApp({ challenge }: QuizAppProps) {
         }
     }, []);
 
-    useEffect(() => {
-        const parsed = parseInviteFromSearch(window.location.search);
-        if (!parsed) return;
-        setInvite(parsed);
-        if (parsed.category) {
-            const target = visibleCategories.find((item) => item.id === parsed.category);
-            if (target && !target.locked && playableCategories.has(target.id)) {
-                setActiveCategory(target.id);
-                setIndex(0);
-                setAnswers({});
-                setRevealed(false);
-                setPhase("playing");
-            }
-        }
-    }, [playableCategories, visibleCategories]);
-
-    useEffect(() => {
-        if (!visibleCategories.some((category) => category.id === activeCategory)) {
-            setActiveCategory("all");
-        }
-    }, [activeCategory, visibleCategories]);
-
-    function toggleLanguage() {
-        const nextLanguage = language === "en" ? "zh" : "en";
-        setLanguage(nextLanguage);
-        window.localStorage.setItem("ai-photo-language", nextLanguage);
-    }
-
-    function resetRun() {
-        setIndex(0);
-        setAnswers({});
-        setRevealed(false);
-        setPhase("intro");
-    }
-
-    function selectCategory(category: CategoryId) {
-        const target = visibleCategories.find((item) => item.id === category);
-        if (!target || target.locked) return;
-        setActiveCategory(category);
-        setIndex(0);
-        setAnswers({});
-        setRevealed(false);
-    }
-
-    function startChallenge() {
-        if (questions.length === 0) return;
+    function startRun(seed = createRunSeed()) {
+        if (questionsPerRun === 0) return;
+        setRunSeed(seed);
         setIndex(0);
         setAnswers({});
         setRevealed(false);
@@ -143,6 +88,19 @@ export function QuizApp({ challenge }: QuizAppProps) {
         requestAnimationFrame(() => {
             window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
         });
+    }
+
+    useEffect(() => {
+        const parsed = parseInviteFromSearch(window.location.search);
+        if (!parsed) return;
+        setInvite(parsed);
+        startRun(parsed.runSeed ?? createRunSeed());
+    }, []);
+
+    function toggleLanguage() {
+        const nextLanguage = language === "en" ? "zh" : "en";
+        setLanguage(nextLanguage);
+        window.localStorage.setItem("ai-photo-language", nextLanguage);
     }
 
     function select(choice: ChoiceKey) {
@@ -162,7 +120,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
     }
 
     function restart() {
-        resetRun();
+        startRun();
     }
 
     if (phase === "done") {
@@ -172,7 +130,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                 score={score}
                 llmScore={llmScore}
                 opponentName={opponentName}
-                category={activeCategory}
+                runSeed={runSeed ?? undefined}
                 language={language}
                 onRestart={restart}
             />
@@ -217,7 +175,6 @@ export function QuizApp({ challenge }: QuizAppProps) {
                     <Sparkles className="h-5 w-5 shrink-0 text-accent" />
                     <p className="truncate text-sm font-semibold text-ink">{c.appName}</p>
                 </div>
-                <p className="mt-1 truncate text-sm text-muted">{t(challenge.title, language)}</p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
                 <Button
@@ -241,13 +198,58 @@ export function QuizApp({ challenge }: QuizAppProps) {
             <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-4 sm:px-7 sm:py-5 lg:px-10">
                 {header}
                 {inviteBanner}
-                <CategoryShowcase
-                    activeCategory={activeCategory}
-                    categories={visibleCategories}
-                    language={language}
-                    onSelect={selectCategory}
-                    onStart={startChallenge}
-                />
+                <section className="flex min-h-[calc(100svh-5.5rem)] items-center py-8 sm:py-10">
+                    <div className="animate-quiet-rise grid w-full gap-8 xl:grid-cols-[minmax(0,1.15fr)_minmax(26rem,0.85fr)] xl:items-center xl:gap-10">
+                        <div className="max-w-none">
+                            <Badge>{c.truthKicker}</Badge>
+                            <h1 className="mt-5 text-4xl font-semibold leading-[1.08] text-ink sm:mt-6 sm:text-5xl lg:whitespace-nowrap lg:text-[3.25rem] lg:leading-[1.04] xl:text-5xl 2xl:text-6xl">
+                                {c.truthHeadline}
+                            </h1>
+                            <p className="mt-5 max-w-xl text-base leading-7 text-muted sm:mt-6 sm:text-lg sm:leading-8">
+                                {c.truthBody}
+                            </p>
+
+                            <div className="mt-8 flex flex-wrap gap-3">
+                                <Button
+                                    className="w-full sm:w-auto"
+                                    disabled={questionsPerRun === 0}
+                                    onClick={() => startRun()}
+                                    size="lg"
+                                    type="button"
+                                >
+                                    {c.startChallenge}
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className="w-full max-w-xl rounded-2xl border border-line bg-white/65 p-6 shadow-soft-line xl:justify-self-end">
+                            <div className="flex items-center justify-between gap-3">
+                                <Badge className="normal-case">{c.mixedPool}</Badge>
+                                <p className="text-sm text-muted">{c.sceneCount(challenge.questions.length)}</p>
+                            </div>
+                            <p className="mt-4 text-3xl font-semibold text-ink">
+                                {questionsPerRun}
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-muted">
+                                {c.randomRunInfo(questionsPerRun, challenge.questions.length)}
+                            </p>
+                            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                                <div className="rounded-md border border-line bg-paper/70 px-4 py-4">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                                        {c.pairMode}
+                                    </p>
+                                    <p className="mt-2 text-sm leading-6 text-ink">{c.pairPrompt}</p>
+                                </div>
+                                <div className="rounded-md border border-line bg-paper/70 px-4 py-4">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                                        {c.singleMode}
+                                    </p>
+                                    <p className="mt-2 text-sm leading-6 text-ink">{c.singlePrompt}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </main>
         );
     }
@@ -263,7 +265,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                 <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
                     <div className="max-w-xl">
                         <div className="flex flex-wrap gap-2">
-                            <Badge className="normal-case">{t(question.category, language)}</Badge>
+                            <Badge className="normal-case">{c.mixedPool}</Badge>
                             <Badge className="normal-case">
                                 {question.mode === "pair" ? c.pairMode : c.singleMode}
                             </Badge>
@@ -279,7 +281,7 @@ export function QuizApp({ challenge }: QuizAppProps) {
                         </div>
                         <Button
                             className="mt-5"
-                            onClick={resetRun}
+                            onClick={() => startRun()}
                             size="sm"
                             type="button"
                             variant="ghost"
